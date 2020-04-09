@@ -1,7 +1,16 @@
 #cloud-config 
 
+fqdn: cs.rdkr.uk
+hostname: cs.rdkr.uk
+
 mounts:
   - [sda, /mnt]
+
+users:
+  - name: csgo
+    lock_passwd: True
+    homedir: /mnt/csgo
+    shell: /bin/bash
 
 package_upgrade: true
 
@@ -27,12 +36,36 @@ write_files:
       WantedBy=multi-user.target
 
   - owner: root:root
-    path: /mnt/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
+    path: /root/csgoserver.cfg
     content: |
-      sv_setsteamaccount ${srcds_token}
+      #### Game Server Settings ####
+
+      ## Server Start Settings | https://docs.linuxgsm.com/configuration/start-parameters
+      # https://docs.linuxgsm.com/game-servers/counter-strike-global-offensive
+      
+      gamemode="1"
+      mapgroup="mg_active"
+      defaultmap="de_mirage"
+
+      maxplayers="10"
+      tickrate="128"
+
+      gslt="${srcds_token}"
+
+      ## Workshop Parameters | https://developer.valvesoftware.com/wiki/CSGO_Workshop_For_Server_Operators
+      # To get an API key visit - https://steamcommunity.com/dev/apikey
+      wsapikey="${workshop_token}"
+      wscollectionid=""
+      wsstartmap=""
 
 runcmd:
-  - "adduser --disabled-password --gecos '' --home /mnt/csgo --no-create-home csgo"
-  - "chown -R csgo:csgo /mnt/csgo"
-  - "systemctl enable csgo"
-  - "systemctl start csgo"
+  - 'echo steamcmd steamcmd/question select "I AGREE" | sudo debconf-set-selections'
+  - 'echo steamcmd steamcmd/license note '' | sudo debconf-set-selections'
+  - 'dpkg --add-architecture i386'
+  - 'apt update'
+  - 'apt install -y netcat curl wget file tar bzip2 gzip unzip bsdmainutils python util-linux ca-certificates binutils bc jq tmux lib32gcc1 libstdc++6 lib32stdc++6 steamcmd'
+  - 'echo "ip=$(curl http://169.254.169.254/metadata/v1/interfaces/public/0/anchor_ipv4/address)" >> /root/csgoserver.cfg'
+  - 'cp /root/csgoserver.cfg /mnt/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg'
+  - 'chown -R csgo:csgo /mnt/csgo'
+  - 'systemctl enable csgo'
+  - 'systemctl start csgo'

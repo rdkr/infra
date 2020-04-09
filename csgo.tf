@@ -2,6 +2,13 @@ variable "srcds_token" {
   type = string
 }
 
+resource "digitalocean_volume" "csgo" {
+  region                  = "lon1"
+  name                    = "csgo"
+  size                    = 50
+  initial_filesystem_type = "ext4"
+}
+
 resource "digitalocean_droplet" "csgo" {
   name     = "csgo"
   image    = "ubuntu-18-04-x64"
@@ -10,14 +17,8 @@ resource "digitalocean_droplet" "csgo" {
   ssh_keys = [26584190]
   user_data = templatefile("${path.module}/csgo.yaml", {
     srcds_token = var.srcds_token
+    workshop_token = "abc"
   })
-}
-
-resource "digitalocean_volume" "csgo" {
-  region                  = "lon1"
-  name                    = "csgo"
-  size                    = 50
-  initial_filesystem_type = "ext4"
 }
 
 resource "digitalocean_volume_attachment" "foobar" {
