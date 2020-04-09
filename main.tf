@@ -55,7 +55,9 @@ resource "digitalocean_droplet" "csgo" {
   region = "lon1"
   size = "s-1vcpu-1gb"
   ssh_keys = [26584190]
-  # user_data = templatefile("${path.module}/cloud-config.yaml", {})
+  user_data = templatefile("${path.module}/cloud-config.yaml", {
+    srcds_token = var.srcds_token
+  })
 }
 
 resource "digitalocean_volume" "csgo" {

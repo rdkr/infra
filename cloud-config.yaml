@@ -1,0 +1,35 @@
+#cloud-config 
+
+package_upgrade: true
+
+write_files:
+  - owner: root:root
+    path: /etc/systemd/system/csgo.service
+    content: |
+      [Unit]
+      Description=csgo
+      After=network-online.target
+      Wants=network-online.target
+      
+      [Service]
+      Type=forking
+      User=csgo
+      WorkingDirectory=/mnt/csgo/csgo
+      ExecStart=/mnt/csgo/csgo/csgoserver start
+      ExecStop=/mnt/csgo/csgo/csgoserver stop
+      Restart=no
+      RemainAfterExit=yes
+      
+      [Install]
+      WantedBy=multi-user.target
+
+  - owner: root:root
+    path: /etc/systemd/system/csgo.service
+    content: |
+      sv_setsteamaccount ${srcds_token}
+
+runcmd:
+  - adduser --disabled-password --gecos "" --home /mnt/csgo/csgo --no-create-home csgo
+  - chmod -R csgo:csgo /mnt/csgo/csgo
+  - systemctl enable csgo
+  - systemctl start csgo
