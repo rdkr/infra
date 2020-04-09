@@ -32,7 +32,7 @@ write_files:
       sv_setsteamaccount ${srcds_token}
 
 runcmd:
-  - adduser --disabled-password --gecos "" --home /mnt/csgo --no-create-home csgo
-  - chmod -R csgo:csgo /mnt/csgo
-  - systemctl enable csgo
-  - systemctl start csgo
+  - "adduser --disabled-password --gecos '' --home /mnt/csgo --no-create-home csgo"
+  - "chown -R csgo:csgo /mnt/csgo"
+  - "systemctl enable csgo"
+  - "systemctl start csgo"

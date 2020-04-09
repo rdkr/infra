@@ -26,9 +26,9 @@ resource "digitalocean_volume_attachment" "foobar" {
 }
 
 resource "cloudflare_record" "cs_rdkr_uk" {
-  zone_id = "rdkr.uk"
+  zone_id = "f6d706e06f5fdb858d0c78bafb1194ec"
   name    = "cs"
   value   = digitalocean_droplet.csgo.ipv4_address
   type    = "A"
-  ttl     = 60
+  ttl     = 1
 }
