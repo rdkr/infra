@@ -1,0 +1,38 @@
+#cloud-config 
+
+mounts:
+  - [sda, /mnt]
+
+package_upgrade: true
+
+write_files:
+  - owner: root:root
+    path: /etc/systemd/system/csgo.service
+    content: |
+      [Unit]
+      Description=csgo
+      After=network-online.target
+      Wants=network-online.target
+      
+      [Service]
+      Type=forking
+      User=csgo
+      WorkingDirectory=/mnt/csgo
+      ExecStart=/mnt/csgo/csgoserver start
+      ExecStop=/mnt/csgo/csgoserver stop
+      Restart=no
+      RemainAfterExit=yes
+      
+      [Install]
+      WantedBy=multi-user.target
+
+  - owner: root:root
+    path: /mnt/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
+    content: |
+      sv_setsteamaccount ${srcds_token}
+
+runcmd:
+  - adduser --disabled-password --gecos "" --home /mnt/csgo --no-create-home csgo
+  - chmod -R csgo:csgo /mnt/csgo
+  - systemctl enable csgo
+  - systemctl start csgo
