@@ -55,9 +55,9 @@ resource "digitalocean_droplet" "csgo" {
   region = "lon1"
   size = "s-1vcpu-1gb"
   ssh_keys = [26584190]
-  user_data = templatefile(file("${path.module}/cloud-config.yaml"), {
-    consul_address = "${aws_instance.consul.private_ip}"
-  })
+  # user_data = templatefile(file("${path.module}/cloud-config.yaml"), {
+  #   consul_address = "${aws_instance.consul.private_ip}"
+  # })
 }
 
 resource "digitalocean_volume" "csgo" {
