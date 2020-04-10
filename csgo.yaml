@@ -44,7 +44,7 @@ write_files:
       * * * * * csgo wget -O /mnt/csgo/serverfiles/csgo/addons/sourcemod/configs/admins_simple.ini https://raw.githubusercontent.com/rdkr/infra/master/csgo/admins_simple.ini > /dev/null
       * * * * * csgo wget -O serverfiles/csgo/addons/sourcemod/configs/deathmatch/deathmatch.ini https://raw.githubusercontent.com/rdkr/infra/master/csgo/deathmatch.ini > /dev/null
       * * * * * csgo wget -O serverfiles/csgo/addons/sourcemod/configs/adminmenu_cfgs.txt https://raw.githubusercontent.com/rdkr/infra/master/csgo/adminmenu_cfgs.txt > /dev/null
-      * * * * * csgo wget -O serverfiles/csgo/cfg/sourcemod/map-cfg/aim_.cfg serverfiles/csgo/addons/sourcemod/configs/aim_.txt
+      * * * * * csgo wget -O serverfiles/csgo/cfg/sourcemod/map-cfg/aim_.cfg https://raw.githubusercontent.com/rdkr/infra/master/csgo/aim_.cfg
       * * * * * csgo ./csgoserver monitor > /dev/null
 
   - path: /root/lgsm.cfg
@@ -56,8 +56,8 @@ write_files:
       gametype="0"
       gamemode="1"
 
-      mapgroup="mg_active"
-      defaultmap="de_mirage"
+      mapgroup=""
+      defaultmap=""
 
       maxplayers="10"
       tickrate="128"
@@ -65,8 +65,8 @@ write_files:
       gslt="${csgo_gslt_token}"
 
       wsapikey="${csgo_web_token}"
-      wscollectionid="134597451"
-      wsstartmap="aim_map"
+      wscollectionid=""
+      wsstartmap=""
 
       updateonstart="on"
 
@@ -74,7 +74,9 @@ write_files:
     owner: root:root
     content: |
       rcon_password "${csgo_rcon_password}"
-      exec server.cfg
+      hostname "cs.rdkr.uk"
+      bot_kick
+      mp_endmatch_votenextmap 0
 
 runcmd:
   - su - csgo -c """wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"""

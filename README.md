@@ -5,6 +5,7 @@
 
 ```
 
+mv serverfiles/csgo/addons/sourcemod/plugins/nextmap.smx serverfiles/csgo/addons/sourcemod/plugins/disabled/
 mv serverfiles/csgo/addons/sourcemod/plugins/fun* serverfiles/csgo/addons/sourcemod/plugins/disabled
 
 wget https://github.com/splewis/csgo-pug-setup/releases/download/2.0.5/pugsetup_2.0.5.zip
