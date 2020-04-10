@@ -17,8 +17,8 @@ users:
 package_upgrade: true
 
 write_files:
-  - owner: root:root
-    path: /etc/systemd/system/csgo.service
+  - path: /etc/systemd/system/csgo.service
+    owner: root:root
     content: |
       [Unit]
       Description=csgo
@@ -37,8 +37,15 @@ write_files:
       [Install]
       WantedBy=multi-user.target
 
-  - owner: root:root
-    path: /root/lgsm.cfg
+  - path: /etc/cron.d/csgo
+    owner: root:root
+    content: |
+      * * * * * csgo wget -O /mnt/csgo/serverfiles/csgo/cfg/csgoserver.cfg https://raw.githubusercontent.com/rdkr/infra/master/csgo/server.cfg > /dev/null
+      * * * * * csgo wget -O /mnt/csgo/serverfiles/csgo/addons/sourcemod/configs/admins_simple.ini https://raw.githubusercontent.com/rdkr/infra/master/csgo/admins_simple.ini > /dev/null
+      * * * * * csgo ./csgoserver monitor > /dev/null
+
+  - path: /root/lgsm.cfg
+    owner: root:root
     content: |
       
       ip={{ ds.meta_data.interfaces.public[0].ipv4.ip_address }}
@@ -60,81 +67,10 @@ write_files:
 
       updateonstart="on"
 
-  - owner: root:root
-    path: /root/csgo.cfg
-    content: |
-      hostname "cs.rdkr.uk"
-      rcon_password "adminjjPXG8Lo"
-      sv_password ""
-      sv_contact "neel@rdkr.uk"
-
-      // Tags - Used to provide extra information to clients when they're browsing for servers. Separate tags with a comma.
-      // Example: sv_tags "128-tick,deathmatch,dm,ffa,pistol,dust2"
-      sv_tags ""
-
-      // Region - The region of the world to report this server in.
-      // Default: -1
-      // 0 - US East, 1 - US West, 2 - South America, 3 - Europe, 4 - Asia, 5 - Australia, 6 - Middle East, 7 - Africa
-      sv_region -1
-
-      // ............................. Server Logging ............................. //
-
-      // Enable log - Enables logging to file, console, and udp < on | off >.
-      // Recommended: log on
-      log on
-
-      // Log bans - Log server bans in the server logs.
-      // Default: sv_logbans 1
-      // Recommended: sv_logbans 1
-      sv_logbans 1
-
-      // Log echo - Display log information to the server console.
-      // Default: sv_logecho 1
-      // Recommended: sv_logecho 1
-      sv_logecho 1
-
-      // Log file - Log server information in the log file.
-      // Default: sv_logfile 1
-      // Recommended: sv_logfile 1
-      sv_logfile 1
-
-      // One file log - Log server information to only one file.
-      // Default: sv_log_onefile 0
-      // Recommended: sv_log_onefile 0
-      sv_log_onefile 0
-
-      // Server Hibernation
-      sv_hibernate_when_empty 1
-      sv_hibernate_ms 5
-
-      // ............................. Server Query ............................. //
-      // More info at: https://www.gametracker.com/games/csgo/forum.php?thread=91691
-      host_name_store 1
-      host_info_show 1
-      host_players_show 2
-
-      // ................................ Ban List ................................ //
-
-      // User ban - Server banlist based on user steam ID.
-      // Recommended: exec banned_user.cfg
-      exec banned_user.cfg
-
-      // IP ban - Server banlist based on user IP.
-      // Recommended: exec banned_ip.cfg
-      exec banned_ip.cfg
-
-      // Write ID - Writes a list of permanently-banned user IDs to banned_user.cfg.
-      writeid
-
-      // Write IP - Save the ban list to banned_ip.cfg.
-      writeip
-
-
 runcmd:
   - su - csgo -c """wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"""
   - su - csgo -c """./csgoserver auto-install"""
   - cp /root/lgsm.cfg /mnt/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
-  - cp /root/csgo.cfg /mnt/csgo/serverfiles/csgo/cfg/csgoserver.cfg
   - chown -R csgo:csgo /mnt/csgo
   - systemctl enable csgo
   - systemctl start csgo
