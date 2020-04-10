@@ -1,4 +1,8 @@
-variable "srcds_token" {
+variable "csgo_gslt_token" {
+  type = string
+}
+
+variable "csgo_web_token" {
   type = string
 }
 
@@ -16,8 +20,8 @@ resource "digitalocean_droplet" "csgo" {
   size     = "s-1vcpu-1gb"
   ssh_keys = [26584190]
   user_data = templatefile("${path.module}/csgo.yaml", {
-    srcds_token = var.srcds_token
-    workshop_token = "abc"
+    csgo_gslt_token = var.csgo_gslt_token
+    csgo_web_token  = var.csgo_web_token
   })
 }
 

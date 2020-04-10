@@ -9,8 +9,8 @@ mounts:
 users:
   - name: csgo
     lock_passwd: True
-    homedir: /mnt/csgo
     shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
 
 package_upgrade: true
 
@@ -38,11 +38,6 @@ write_files:
   - owner: root:root
     path: /root/lgsm.cfg
     content: |
-
-      #### Game Server Settings ####
-
-      ## Server Start Settings | https://docs.linuxgsm.com/configuration/start-parameters
-      # https://docs.linuxgsm.com/game-servers/counter-strike-global-offensive
       
       gamemode="1"
       mapgroup="mg_active"
@@ -51,11 +46,9 @@ write_files:
       maxplayers="10"
       tickrate="128"
 
-      gslt="${srcds_token}"
+      gslt="${csgo_gslt_token}"
 
-      ## Workshop Parameters | https://developer.valvesoftware.com/wiki/CSGO_Workshop_For_Server_Operators
-      # To get an API key visit - https://steamcommunity.com/dev/apikey
-      wsapikey="${workshop_token}"
+      wsapikey="${csgo_web_token}"
       wscollectionid=""
       wsstartmap=""
 
@@ -132,11 +125,8 @@ write_files:
 
 
 runcmd:
-  - echo steam steam/question select "I AGREE" | sudo debconf-set-selections
-  - echo steam steam/license note "" | sudo debconf-set-selections
-  - dpkg --add-architecture i386
-  - apt update
-  - apt install -y netcat curl wget file tar bzip2 gzip unzip bsdmainutils python util-linux ca-certificates binutils bc jq tmux lib32gcc1 libstdc++6 lib32stdc++6 steamcmd
+  - su - csgo -c """wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"""
+  - su - csgo -c """./csgoserver auto-install"""
   - echo "ip=$(curl -s http://169.254.169.254/metadata/v1.json | jq -r '.interfaces.public[0].ipv4.ip_address')" >> /root/lgsm.cfg
   - cp /root/lgsm.cfg /mnt/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
   - cp /root/csgo.cfg /mnt/csgo/serverfiles/csgo/cfg/csgoserver.cfg
