@@ -43,6 +43,8 @@ write_files:
       * * * * * csgo wget -O /mnt/csgo/serverfiles/csgo/cfg/server.cfg https://raw.githubusercontent.com/rdkr/infra/master/csgo/server.cfg > /dev/null
       * * * * * csgo wget -O /mnt/csgo/serverfiles/csgo/addons/sourcemod/configs/admins_simple.ini https://raw.githubusercontent.com/rdkr/infra/master/csgo/admins_simple.ini > /dev/null
       * * * * * csgo wget -O serverfiles/csgo/addons/sourcemod/configs/deathmatch/deathmatch.ini https://raw.githubusercontent.com/rdkr/infra/master/csgo/deathmatch.ini > /dev/null
+      * * * * * csgo wget -O serverfiles/csgo/addons/sourcemod/configs/adminmenu_cfgs.txt https://raw.githubusercontent.com/rdkr/infra/master/csgo/adminmenu_cfgs.txt > /dev/null
+      * * * * * csgo wget -O serverfiles/csgo/cfg/sourcemod/map-cfg/aim_.cfg serverfiles/csgo/addons/sourcemod/configs/aim_.txt
       * * * * * csgo ./csgoserver monitor > /dev/null
 
   - path: /root/lgsm.cfg
