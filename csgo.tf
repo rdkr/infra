@@ -43,7 +43,7 @@ resource "digitalocean_volume_attachment" "foobar" {
   volume_id  = digitalocean_volume.csgo.id
 }
 
-resource "cloudflare_record" "cs_rdkr_uk" {
+resource "cloudflare_record" "dm_rdkr_uk" {
   zone_id = "f6d706e06f5fdb858d0c78bafb1194ec"
   name    = "dm"
   value   = digitalocean_droplet.csgo.ipv4_address

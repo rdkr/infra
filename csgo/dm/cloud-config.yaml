@@ -43,8 +43,22 @@ write_files:
     permissions: '0755'
     content: |
       #!/usr/bin/env sh
+
+      wget -nc https://mms.alliedmods.net/mmsdrop/1.10/mmsource-1.10.7-git971-linux.tar.gz
+      tar xfv mmsource-1.10.7-git971-linux.tar.gz -C serverfiles/csgo
+
+      wget -nc https://sm.alliedmods.net/smdrop/1.10/sourcemod-1.10.0-git6482-linux.tar.gz
+      tar xfv sourcemod-1.10.0-git6482-linux.tar.gz -C serverfiles/csgo
+
+      mv serverfiles/csgo/addons/sourcemod/plugins/nextmap.smx serverfiles/csgo/addons/sourcemod/plugins/disabled/
+      mv serverfiles/csgo/addons/sourcemod/plugins/fun* serverfiles/csgo/addons/sourcemod/plugins/disabled
+
+      wget -nc https://github.com/Maxximou5/csgo-deathmatch/releases/download/v2.0.9/deathmatch.zip
+      unzip deathmatch.zip -d serverfiles/csgo/addons/sourcemod
+
       csgo=/mnt/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
+
       wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini 
       wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/dm/deathmatch.ini 
 
@@ -68,7 +82,7 @@ write_files:
       wsapikey="${csgo_web_token}"
       wscollectionid="134597451"
 
-      # updateonstart="on"
+      updateonstart="on"
 
   - path: /root/csgoserver.cfg
     owner: root:root
