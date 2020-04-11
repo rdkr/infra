@@ -1,0 +1,35 @@
+"GameModes_Server.txt"
+{
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Mapgroups
+//
+// To use a mapgroup you first have to define what maps are in which mapgroup.
+// After that you have to specify which gamemode will be run on which map.
+//
+// After specifying the mapgroups you need to log in to your Webinterface and start the CS:GO server with your mapgroup
+//
+//
+// More information:
+// https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Dedicated_Servers
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	"mapgroups"
+	{
+		"competitive"									// Definition of a specific mapgroup.
+		{
+			"name"			"competitive"
+			"maps"
+			{
+				"de_dust2"		""
+				"de_mirage"		""
+				"de_vertigo"		""
+				"de_inferno"		""
+				"de_nuke"		""
+				"de_train"		""
+                "de_overpass"		""
+			}
+		}
+	}
+}

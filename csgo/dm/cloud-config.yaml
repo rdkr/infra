@@ -46,7 +46,7 @@ write_files:
       csgo=/mnt/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
       wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini 
-      wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/deathmatch.ini 
+      wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/dm/deathmatch.ini 
 
   - path: /root/lgsm.cfg
     owner: root:root

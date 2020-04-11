@@ -45,7 +45,7 @@ write_files:
       #!/usr/bin/env sh
       csgo=/mnt/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
-      wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini
+      wget --force-directories -O $${csgo}/gamemodes_server.txt $${github}/pug/gamemodes_server.txt
 
   - path: /root/lgsm.cfg
     owner: root:root
@@ -56,7 +56,7 @@ write_files:
       gametype="0"
       gamemode="1"
 
-      mapgroup=""
+      mapgroup="competitive"
       defaultmap=""
 
       maxplayers="10"
