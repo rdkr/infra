@@ -71,7 +71,6 @@ write_files:
     owner: root:root
     content: |
       rcon_password "${csgo_rcon_password}"
-      sv_password "${csgo_sv_password}"
 
       hostname "dm.rdkr.uk"
       sv_tags "aim,deathmatch,dm,nobots,uk"

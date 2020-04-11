@@ -53,13 +53,13 @@ resource "cloudflare_record" "cs_rdkr_uk" {
 
 resource "digitalocean_volume" "pug" {
   region                  = "lon1"
-  name                    = "pug.rdkr.uk"
+  name                    = "pug"
   size                    = 50
   initial_filesystem_type = "ext4"
 }
 
 resource "digitalocean_droplet" "pug" {
-  name     = "pug.rdkr.uk"
+  name     = "pug"
   image    = "ubuntu-18-04-x64"
   region   = "lon1"
   size     = "s-1vcpu-2gb"
@@ -72,14 +72,14 @@ resource "digitalocean_droplet" "pug" {
 }
 
 resource "digitalocean_volume_attachment" "pug" {
-  droplet_id = digitalocean_droplet.csgo.id
-  volume_id  = digitalocean_volume.csgo.id
+  droplet_id = digitalocean_droplet.pug.id
+  volume_id  = digitalocean_volume.pug.id
 }
 
 resource "cloudflare_record" "pug_rdkr_uk" {
   zone_id = "f6d706e06f5fdb858d0c78bafb1194ec"
   name    = "pug"
-  value   = digitalocean_droplet.csgo.ipv4_address
+  value   = digitalocean_droplet.pug.ipv4_address
   type    = "A"
   ttl     = 1
 }
