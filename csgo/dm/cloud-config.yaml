@@ -1,0 +1,112 @@
+## template: jinja
+#cloud-config 
+
+fqdn: dm.rdkr.uk
+hostname: dm.rdkr.uk
+
+mounts:
+  - [sda, /mnt]
+
+users:
+  - name: csgo
+    homedir: /mnt/csgo
+    lock_passwd: True
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+package_upgrade: true
+
+write_files:
+  - path: /etc/systemd/system/csgo.service
+    owner: root:root
+    content: |
+      [Unit]
+      Description=csgo
+      After=network-online.target
+      Wants=network-online.target
+      
+      [Service]
+      Type=forking
+      User=csgo
+      WorkingDirectory=/mnt/csgo
+      ExecStartPre=/mnt/csgo/pre-start.sh
+      ExecStart=/mnt/csgo/csgoserver start
+      ExecStop=/mnt/csgo/csgoserver stop
+      Restart=no
+      RemainAfterExit=yes
+      
+      [Install]
+      WantedBy=multi-user.target
+
+  - path: /root/pre-start.sh
+    owner: root:root
+    permissions: '0755'
+    content: |
+      #!/usr/bin/env sh
+      csgo=/mnt/csgo/serverfiles/csgo
+      github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
+      wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini 
+      wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/deathmatch.ini 
+
+  - path: /root/lgsm.cfg
+    owner: root:root
+    content: |
+      
+      ip={{ ds.meta_data.interfaces.public[0].ipv4.ip_address }}
+      
+      gametype="0"
+      gamemode="1"
+
+      mapgroup=""
+      defaultmap=""
+
+      maxplayers="10"
+      tickrate="128"
+
+      gslt="${csgo_gslt_token}"
+
+      # updateonstart="on"
+
+  - path: /root/csgoserver.cfg
+    owner: root:root
+    content: |
+      rcon_password "${csgo_rcon_password}"
+      sv_password "${csgo_sv_password}"
+
+      hostname "dm.rdkr.uk"
+      sv_tags "aim,deathmatch,dm,nobots,uk"
+
+      bot_quota 0
+      bot_kick
+
+      mp_warmuptime 0
+      mp_freezetime 0
+      mp_buytime 0
+
+      mp_timelimit 10
+      mp_roundtime 10
+      mp_roundtime_defuse 10
+
+      mp_maxrounds 0
+
+      mp_match_end_restart 0
+      mp_ignore_round_win_conditions 0
+
+      mp_respawn_on_death_t 1
+      mp_respawn_on_death_ct 1
+
+      mp_force_pick_time 0
+      mp_force_assign_teams 1
+      mp_match_end_changelevel 1
+
+      mp_endmatch_votenextleveltime 5
+
+runcmd:
+  - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
+  - su - csgo -c "./csgoserver auto-install"
+  - cp --preserve=mode /root/pre-start.sh /mnt/csgo/pre-start.sh
+  - cp /root/csgoserver.cfg /mnt/csgo/serverfiles/csgo/cfg/
+  - cp /root/lgsm.cfg /mnt/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
+  - chown -R csgo:csgo /mnt/csgo
+  - systemctl enable csgo
+  - systemctl start csgo
