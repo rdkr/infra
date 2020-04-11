@@ -62,7 +62,7 @@ write_files:
       csgo=/mnt/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
     
-      wget -O $${csgo}/gamemode_competitive_server.cfg $${github}/pug/gamemode_competitive_server.cfg
+      wget -O $${csgo}/cfg/gamemode_competitive_server.cfg $${github}/pug/gamemode_competitive_server.cfg
       wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini 
       wget -O $${csgo}/gamemodes_server.txt $${github}/pug/gamemodes_server.txt
 
@@ -89,9 +89,11 @@ write_files:
     owner: root:root
     content: |
       rcon_password "${csgo_rcon_password}"
-      sv_password "${csgo_sv_password}"
       hostname "pug.rdkr.uk"
+      sv_password "${csgo_sv_password}"
 
+      host_info_show 2
+      host_players_show 2
 
 runcmd:
   - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"

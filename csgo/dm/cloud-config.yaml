@@ -59,7 +59,7 @@ write_files:
       csgo=/mnt/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
 
-      wget -O $${csgo}/gamemode_competitive_server.cfg $${github}/dm/gamemode_competitive_server.cfg
+      wget -O $${csgo}/cfg/gamemode_competitive_server.cfg $${github}/dm/gamemode_competitive_server.cfg
       wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini 
       wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/dm/deathmatch.ini 
 
@@ -89,9 +89,11 @@ write_files:
     owner: root:root
     content: |
       rcon_password "${csgo_rcon_password}"
-
       hostname "dm.rdkr.uk"
       sv_tags "aim,deathmatch,dm,nobots,uk"
+
+      host_info_show 2
+      host_players_show 2
 
 runcmd:
   - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
