@@ -65,6 +65,9 @@ write_files:
 
       gslt="${csgo_gslt_token}"
 
+      wsapikey="${csgo_web_token}"
+      wscollectionid="134597451"
+
       # updateonstart="on"
 
   - path: /root/csgoserver.cfg
