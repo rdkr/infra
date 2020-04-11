@@ -25,13 +25,13 @@ resource "digitalocean_droplet" "csgo" {
   name     = "csgo"
   image    = "ubuntu-18-04-x64"
   region   = "lon1"
-  size     = "s-1vcpu-1gb"
+  size     = "s-1vcpu-2gb"
   ssh_keys = [26584190]
   user_data = templatefile("${path.module}/csgo.yaml", {
     csgo_gslt_token    = var.csgo_gslt_token
     csgo_web_token     = var.csgo_web_token
     csgo_rcon_password = var.csgo_rcon_password
-    csgo_sv_password = var.csgo_sv_password
+    csgo_sv_password   = var.csgo_sv_password
   })
 }
 

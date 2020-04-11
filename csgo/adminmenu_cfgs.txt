@@ -4,4 +4,6 @@
  */
 Configs
 {
+	"cfg/pw.cfg" "password on"
+	"cfg/nopw.cfg" "password off"
 }
