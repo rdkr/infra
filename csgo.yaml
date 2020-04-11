@@ -80,7 +80,7 @@ write_files:
     content: |
       rcon_password "${csgo_rcon_password}"
 
-  - path: /root/nopw.cfg
+  - path: /root/pw.cfg
     owner: root:root
     content: |
       sv_password "${csgo_sv_password}"
