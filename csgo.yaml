@@ -49,6 +49,7 @@ write_files:
       wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/deathmatch.ini 
       wget -O $${csgo}/addons/sourcemod/configs/adminmenu_cfgs.txt $${github}/adminmenu_cfgs.txt 
       wget -O $${csgo}/cfg/sourcemod/map-cfg/aim_.cfg $${github}/aim_.cfg
+      wget -O $${csgo}/mapcycle.txt $${github}/mapcycle.txt
 
   - path: /root/lgsm.cfg
     owner: root:root
@@ -77,7 +78,12 @@ write_files:
     owner: root:root
     content: |
       rcon_password "${csgo_rcon_password}"
-      hostname "cs.rdkr.uk"
+
+      sv_password "${csgo_sv_password}"
+      hostname "cs.rdkr.uk - closed for event / training"
+      sv_tags "private,nobots,uk"
+      bot_quota 0
+      bot_kick
 
 runcmd:
   - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"

@@ -10,6 +10,10 @@ variable "csgo_rcon_password" {
   type = string
 }
 
+variable "csgo_sv_password" {
+  type = string
+}
+
 resource "digitalocean_volume" "csgo" {
   region                  = "lon1"
   name                    = "csgo"
@@ -27,6 +31,7 @@ resource "digitalocean_droplet" "csgo" {
     csgo_gslt_token    = var.csgo_gslt_token
     csgo_web_token     = var.csgo_web_token
     csgo_rcon_password = var.csgo_rcon_password
+    csgo_sv_password = var.csgo_sv_password
   })
 }
 
