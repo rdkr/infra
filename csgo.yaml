@@ -79,6 +79,8 @@ write_files:
     owner: root:root
     content: |
       rcon_password "${csgo_rcon_password}"
+      hostname "cs.rdkr.uk"
+      sv_tags "aim,deathmatch,dm,nobots,uk"
 
   - path: /root/pw.cfg
     owner: root:root
