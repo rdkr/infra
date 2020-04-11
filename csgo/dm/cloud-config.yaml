@@ -59,6 +59,7 @@ write_files:
       csgo=/mnt/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
 
+      wget -O $${csgo}/gamemode_competitive_server.cfg $${github}/dm/gamemode_competitive_server.cfg
       wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini 
       wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/dm/deathmatch.ini 
 
@@ -91,31 +92,6 @@ write_files:
 
       hostname "dm.rdkr.uk"
       sv_tags "aim,deathmatch,dm,nobots,uk"
-
-      bot_quota 0
-      bot_kick
-
-      mp_warmuptime 0
-      mp_freezetime 0
-      mp_buytime 0
-
-      mp_timelimit 10
-      mp_roundtime 10
-      mp_roundtime_defuse 10
-
-      mp_maxrounds 0
-
-      mp_match_end_restart 0
-      mp_ignore_round_win_conditions 0
-
-      mp_respawn_on_death_t 1
-      mp_respawn_on_death_ct 1
-
-      mp_force_pick_time 0
-      mp_force_assign_teams 1
-      mp_match_end_changelevel 1
-
-      mp_endmatch_votenextleveltime 5
 
 runcmd:
   - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
