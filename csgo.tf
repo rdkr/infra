@@ -64,7 +64,7 @@ resource "digitalocean_droplet" "pug" {
   region   = "lon1"
   size     = "s-1vcpu-2gb"
   ssh_keys = [26584190]
-  user_data = templatefile("${path.module}/pug/cloud-config.yaml", {
+  user_data = templatefile("${path.module}/csgo/pug/cloud-config.yaml", {
     csgo_gslt_token    = var.csgo_gslt_token_pug
     csgo_rcon_password = var.csgo_rcon_password
     csgo_sv_password   = var.csgo_sv_password
