@@ -9,7 +9,6 @@ mounts:
 
 users:
   - name: csgo
-    homedir: /mnt/csgo
     lock_passwd: True
     shell: /bin/bash
     sudo: ALL=(ALL) NOPASSWD:ALL
