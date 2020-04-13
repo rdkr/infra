@@ -4,9 +4,6 @@
 fqdn: dm.rdkr.uk
 hostname: dm.rdkr.uk
 
-mounts:
-  - [sda, /home]
-
 users:
   - name: csgo
     lock_passwd: True

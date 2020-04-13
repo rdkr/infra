@@ -1,0 +1,36 @@
+#cloud-config 
+
+users:
+  - name: csgo
+    lock_passwd: True
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+package_upgrade: true
+
+write_files:
+  - path: /etc/systemd/system/csgo.service
+    owner: root:root
+    content: |
+      [Unit]
+      Description=csgo
+      After=network-online.target
+      Wants=network-online.target
+      
+      [Service]
+      Type=forking
+      User=csgo
+      WorkingDirectory=/home/csgo
+      ExecStartPre=/home/csgo/pre-start.sh
+      ExecStart=/home/csgo/csgoserver start
+      ExecStop=/home/csgo/csgoserver stop
+      Restart=no
+      RemainAfterExit=yes
+      
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - su - csgo -c "wget -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
+  - su - csgo -c "./csgoserver update-lgsm"
+  - su - csgo -c "./csgoserver auto-install"
