@@ -94,6 +94,10 @@ write_files:
 
       updateonstart="on"
 
+      fn_parms(){
+        parms="-game csgo -usercon -strictportbind -ip $${ip} -port $${port} +clientport $${clientport} +tv_port $${sourcetvport} +sv_setsteamaccount $${gslt} -tickrate $${tickrate} +map $${defaultmap} +servercfgfile $${servercfg} -maxplayers_override $${maxplayers} +mapgroup $${mapgroup} +game_type $${gametype} +game_mode $${gamemode} +host_workshop_collection $${wscollectionid} +workshop_start_map $${wsstartmap} -authkey $${wsapikey} -nobreakpad -nobots"
+      }
+
   - path: /root/csgoserver.cfg
     owner: root:root
     content: |
@@ -103,6 +107,8 @@ write_files:
 
       host_info_show 2
       host_players_show 2
+
+      sv_downloadurl "https://neel.rdkr.uk/csgo"
 
 runcmd:
   - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
