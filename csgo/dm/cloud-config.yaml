@@ -5,11 +5,10 @@ fqdn: dm.rdkr.uk
 hostname: dm.rdkr.uk
 
 mounts:
-  - [sda, /mnt]
+  - [sda, /home]
 
 users:
   - name: csgo
-    homedir: /mnt/csgo
     lock_passwd: True
     shell: /bin/bash
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -28,10 +27,10 @@ write_files:
       [Service]
       Type=forking
       User=csgo
-      WorkingDirectory=/mnt/csgo
-      ExecStartPre=/mnt/csgo/pre-start.sh
-      ExecStart=/mnt/csgo/csgoserver start
-      ExecStop=/mnt/csgo/csgoserver stop
+      WorkingDirectory=/home/csgo
+      ExecStartPre=/home/csgo/pre-start.sh
+      ExecStart=/home/csgo/csgoserver start
+      ExecStop=/home/csgo/csgoserver stop
       Restart=no
       RemainAfterExit=yes
       
@@ -64,7 +63,7 @@ write_files:
       wget -nc -O quake.smx http://www.sourcemod.net/vbcompiler.php?file_id=155260
       mv quake.smx serverfiles/csgo/addons/sourcemod/plugins/
 
-      csgo=/mnt/csgo/serverfiles/csgo
+      csgo=/home/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
 
       wget -O $${csgo}/cfg/gamemode_competitive_server.cfg $${github}/dm/gamemode_competitive_server.cfg
@@ -113,9 +112,9 @@ write_files:
 runcmd:
   - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
   - su - csgo -c "./csgoserver auto-install"
-  - cp --preserve=mode /root/pre-start.sh /mnt/csgo/pre-start.sh
-  - cp /root/csgoserver.cfg /mnt/csgo/serverfiles/csgo/cfg/
-  - cp /root/lgsm.cfg /mnt/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
-  - chown -R csgo:csgo /mnt/csgo
+  - cp --preserve=mode /root/pre-start.sh /home/csgo/pre-start.sh
+  - cp /root/csgoserver.cfg /home/csgo/serverfiles/csgo/cfg/
+  - cp /root/lgsm.cfg /home/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
+  - chown -R csgo:csgo /home/csgo
   - systemctl enable csgo
   - systemctl start csgo

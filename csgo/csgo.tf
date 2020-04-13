@@ -1,11 +1,4 @@
-resource "digitalocean_volume" "csgo" {
-  region                  = "lon1"
-  name                    = "csgo"
-  size                    = 50
-  initial_filesystem_type = "ext4"
-}
-
-resource "digitalocean_droplet" "csgo" {
+resource "digitalocean_droplet" "dm" {
   name     = "csgo"
   image    = "ubuntu-18-04-x64"
   region   = "lon1"
@@ -16,11 +9,6 @@ resource "digitalocean_droplet" "csgo" {
     csgo_web_token     = var.csgo_web_token
     csgo_rcon_password = var.csgo_rcon_password
   })
-}
-
-resource "digitalocean_volume_attachment" "foobar" {
-  droplet_id = digitalocean_droplet.csgo.id
-  volume_id  = digitalocean_volume.csgo.id
 }
 
 resource "digitalocean_droplet" "pug" {
