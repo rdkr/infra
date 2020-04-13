@@ -1,3 +1,17 @@
+terraform {
+  backend "remote" {
+    organization = "rdkr"
+
+    workspaces {
+      name = "infra"
+    }
+  }
+}
+
+variable "do_token" {
+  type = string
+}
+
 variable "csgo_gslt_token_dm" {
   type = string
 }
@@ -51,13 +65,6 @@ resource "cloudflare_record" "dm_rdkr_uk" {
   ttl     = 1
 }
 
-resource "digitalocean_volume" "pug" {
-  region                  = "lon1"
-  name                    = "pug"
-  size                    = 50
-  initial_filesystem_type = "ext4"
-}
-
 resource "digitalocean_droplet" "pug" {
   name     = "pug"
   image    = "ubuntu-18-04-x64"
@@ -69,11 +76,6 @@ resource "digitalocean_droplet" "pug" {
     csgo_rcon_password = var.csgo_rcon_password
     csgo_sv_password   = var.csgo_sv_password
   })
-}
-
-resource "digitalocean_volume_attachment" "pug" {
-  droplet_id = digitalocean_droplet.pug.id
-  volume_id  = digitalocean_volume.pug.id
 }
 
 resource "cloudflare_record" "dm_rdkr_uk_1" {

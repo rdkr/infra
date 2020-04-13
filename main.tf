@@ -1,23 +1,20 @@
-terraform {
-  backend "remote" {
-    organization = "rdkr"
 
-    workspaces {
-      name = "infra"
-    }
-  }
-}
+# terraform {
+#   backend "remote" {
+#     organization = "rdkr"
 
-variable "do_token" {
-  type = string
+#     workspaces {
+#       name = "dns"
+#     }
+#   }
+# }
+
+provider "digitalocean" {
+  token = var.do_token
 }
 
 variable "cloudflare_token" {
   type = string
-}
-
-provider "digitalocean" {
-  token = var.do_token
 }
 
 provider "cloudflare" {
