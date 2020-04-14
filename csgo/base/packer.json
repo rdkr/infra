@@ -1,0 +1,28 @@
+{
+  "variables": {
+    "do_token": ""
+  },
+  "builders": [
+    {
+      "type": "digitalocean",
+      "api_token": "{{ user `do_token` }}",
+      "snapshot_name": "csgo-{{ isotime \"2006-01-02\" }}",
+      "region": "lon1",
+      "image": "ubuntu-18-04-x64",
+      "size": "s-1vcpu-2gb",
+      "ssh_username": "root",
+      "user_data_file": "/packer/cloud-config.yaml"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 10; done",
+        "su - csgo -c 'wget -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver'",
+        "su - csgo -c './csgoserver update-lgsm'",
+        "su - csgo -c './csgoserver auto-install'"
+      ]
+    }
+  ]
+}

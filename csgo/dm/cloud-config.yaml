@@ -4,38 +4,11 @@
 fqdn: dm.rdkr.uk
 hostname: dm.rdkr.uk
 
-users:
-  - name: csgo
-    lock_passwd: True
-    shell: /bin/bash
-    sudo: ALL=(ALL) NOPASSWD:ALL
-
 package_upgrade: true
 
 write_files:
-  - path: /etc/systemd/system/csgo.service
-    owner: root:root
-    content: |
-      [Unit]
-      Description=csgo
-      After=network-online.target
-      Wants=network-online.target
-      
-      [Service]
-      Type=forking
-      User=csgo
-      WorkingDirectory=/home/csgo
-      ExecStartPre=/home/csgo/pre-start.sh
-      ExecStart=/home/csgo/csgoserver start
-      ExecStop=/home/csgo/csgoserver stop
-      Restart=no
-      RemainAfterExit=yes
-      
-      [Install]
-      WantedBy=multi-user.target
-
-  - path: /root/pre-start.sh
-    owner: root:root
+  - path: /home/csgo/pre-start.sh
+    owner: csgo:csgo
     permissions: '0755'
     content: |
       #!/usr/bin/env sh
@@ -63,13 +36,13 @@ write_files:
       csgo=/home/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
 
-      wget -O $${csgo}/cfg/gamemode_competitive_server.cfg $${github}/dm/gamemode_competitive_server.cfg
-      wget -O $${csgo}/addons/sourcemod/configs/admins_simple.ini $${github}/admins_simple.ini 
-      wget -O $${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini $${github}/dm/deathmatch.ini
-      wget -O $${csgo}/addons/sourcemod/configs/QuakeSetsList.cfg $${github}/dm/QuakeSetsList.cfg
+      wget -O ${csgo}/cfg/gamemode_competitive_server.cfg ${github}/dm/gamemode_competitive_server.cfg
+      wget -O ${csgo}/addons/sourcemod/configs/admins_simple.ini ${github}/admins_simple.ini 
+      wget -O ${csgo}/addons/sourcemod/configs/deathmatch/deathmatch.ini ${github}/dm/deathmatch.ini
+      wget -O ${csgo}/addons/sourcemod/configs/QuakeSetsList.cfg ${github}/dm/QuakeSetsList.cfg
 
-  - path: /root/lgsm.cfg
-    owner: root:root
+  - path: /home/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
+    owner: csgo:csgo
     content: |
       
       ip={{ ds.meta_data.interfaces.public[0].ipv4.ip_address }}
@@ -91,11 +64,11 @@ write_files:
       updateonstart="on"
 
       fn_parms(){
-        parms="-game csgo -usercon -strictportbind -ip $${ip} -port $${port} +clientport $${clientport} +tv_port $${sourcetvport} +sv_setsteamaccount $${gslt} -tickrate $${tickrate} +map $${defaultmap} +servercfgfile $${servercfg} -maxplayers_override $${maxplayers} +mapgroup $${mapgroup} +game_type $${gametype} +game_mode $${gamemode} +host_workshop_collection $${wscollectionid} +workshop_start_map $${wsstartmap} -authkey $${wsapikey} -nobreakpad -nobots"
+        parms="-game csgo -usercon -strictportbind -ip ${ip} -port ${port} +clientport ${clientport} +tv_port ${sourcetvport} +sv_setsteamaccount ${gslt} -tickrate ${tickrate} +map ${defaultmap} +servercfgfile ${servercfg} -maxplayers_override ${maxplayers} +mapgroup ${mapgroup} +game_type ${gametype} +game_mode ${gamemode} +host_workshop_collection ${wscollectionid} +workshop_start_map ${wsstartmap} -authkey ${wsapikey} -nobreakpad -nobots"
       }
 
-  - path: /root/csgoserver.cfg
-    owner: root:root
+  - path: /home/csgo/serverfiles/csgo/cfg/csgoserver.cfg 
+    owner: csgo:csgo
     content: |
       rcon_password "${csgo_rcon_password}"
       hostname "dm.rdkr.uk"
@@ -107,11 +80,5 @@ write_files:
       sv_downloadurl "https://neel.rdkr.uk/csgo"
 
 runcmd:
-  - su - csgo -c "wget --no-clobber -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
-  - su - csgo -c "./csgoserver auto-install"
-  - cp --preserve=mode /root/pre-start.sh /home/csgo/pre-start.sh
-  - cp /root/csgoserver.cfg /home/csgo/serverfiles/csgo/cfg/
-  - cp /root/lgsm.cfg /home/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
-  - chown -R csgo:csgo /home/csgo
   - systemctl enable csgo
   - systemctl start csgo

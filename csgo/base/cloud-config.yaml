@@ -29,8 +29,3 @@ write_files:
       
       [Install]
       WantedBy=multi-user.target
-
-runcmd:
-  - su - csgo -c "wget -O linuxgsm.sh https://linuxgsm.sh && chmod +x linuxgsm.sh && bash linuxgsm.sh csgoserver"
-  - su - csgo -c "./csgoserver update-lgsm"
-  - su - csgo -c "./csgoserver auto-install"
