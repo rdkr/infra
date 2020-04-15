@@ -56,7 +56,7 @@ write_files:
       maxplayers="10"
       tickrate="128"
 
-      gslt="{{ env.CSGO_GSLT_TOKEN }}"
+      gslt="{{ env.CSGO_GSLT_TOKEN_PUG }}"
 
       updateonstart="on"
 

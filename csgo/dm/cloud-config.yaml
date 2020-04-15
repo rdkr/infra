@@ -45,7 +45,7 @@ write_files:
     owner: csgo:csgo
     content: |
       
-      ip={{ ds.meta_data.interfaces.public[0].ipv4.ip_address }}
+      ip={% raw %}{{ ds.meta_data.interfaces.public[0].ipv4.ip_address }}{% endraw %}
       
       gametype="0"
       gamemode="1"
@@ -56,9 +56,9 @@ write_files:
       maxplayers="10"
       tickrate="128"
 
-      gslt="${csgo_gslt_token}"
+      gslt="{{ env.CSGO_GSLT_TOKEN_DM }}"
 
-      wsapikey="${csgo_web_token}"
+      wsapikey="{{ env.CSGO_WEB_TOKEN_DM }}"
       wscollectionid="134597451"
 
       updateonstart="on"
@@ -70,7 +70,7 @@ write_files:
   - path: /home/csgo/serverfiles/csgo/cfg/csgoserver.cfg 
     owner: csgo:csgo
     content: |
-      rcon_password "${csgo_rcon_password}"
+      rcon_password ""{{ env.CSGO_RCON_PASSWORD }}""
       hostname "dm.rdkr.uk"
       sv_tags "aim,deathmatch,dm,nobots,uk"
 
