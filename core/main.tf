@@ -3,7 +3,7 @@ terraform {
     organization = "rdkr"
 
     workspaces {
-      name = "dns"
+      name = "core"
     }
   }
 }

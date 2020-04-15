@@ -1,8 +1,16 @@
 # infra
-☁️ personal infra
+
+## core
+
+* terraform on terraform cloud
+    * dns on cloudflare
+    * k8s cluster on digitalocean
 
 ## csgo
 
+* packer
+    * csgo base server on digitalocean
+    
 ```
 wget -nc -O quake.zip https://forums.alliedmods.net/attachment.php?attachmentid=125461&d=1380903530
 unzip quake.zip

@@ -1,6 +1,6 @@
 run:
 	docker build -t discord . 
-	docker run -it \
+	docker run -it --rm \
 		-e DISCORD_TOKEN="${DISCORD_TOKEN}" \
 		-e DO_TOKEN="${DO_TOKEN}" \
 		-e CSGO_GSLT_TOKEN="${CSGO_GSLT_TOKEN}" \
