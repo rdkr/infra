@@ -15,3 +15,11 @@ variable "cloudflare_token" {
 provider "cloudflare" {
   api_token = var.cloudflare_token
 }
+
+variable "do_token" {
+  type = string
+}
+
+provider "digitalocean" {
+  token = var.do_token
+}

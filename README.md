@@ -9,3 +9,9 @@ unzip quake.zip
 aws s3 sync FastDL/sound/quake/standard s3://neel.rdkr.uk/csgo/sound/quake/standard
 rm -r GameServer FastDL quake quake.zip
 ```
+
+
+== digital ocean
+no where to store secrets
+
+== 
