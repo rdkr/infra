@@ -56,7 +56,7 @@ class Server:
         try:
 
             server = await self.create(message)
-            ip = await self.get_ip(server, message)
+            ip = await self.get_ip(message)
             await self.set_dns(ip, message)
             await self.wait_for_csgo(message)
 
@@ -91,7 +91,7 @@ class Server:
 
             if not server and not creating:
                 await message.channel.send(
-                    ":white_circle: [{self.name}.rdkr.uk] [instance] not found - creating..."
+                    f":white_circle: [{self.name}.rdkr.uk] [instance] not found - creating..."
                 )
 
                 creating = True
@@ -112,7 +112,7 @@ class Server:
 
             if timeout % 24 == 0:
                 await message.channel.send(
-                    ":white_circle: [{self.name}.rdkr.uk] [instance] waiting for start..."
+                    f":white_circle: [{self.name}.rdkr.uk] [instance] waiting for start..."
                 )
 
             timeout = timeout - 1
@@ -121,16 +121,18 @@ class Server:
         else:
             raise Exception("instance not found before timeout")
 
-    async def get_ip(self, droplet, message):
+    async def get_ip(self, message):
 
         print(f"start: get_ip")
+
+        manager = digitalocean.Manager(token=os.environ["DO_TOKEN"])
 
         timeout = 120
         while timeout != 0:
 
-            actions = droplet.get_actions()
-            for action in actions:
-                action.load()
+            for droplet in manager.get_all_droplets():
+                if droplet.name == self.name:
+                    break
 
             if droplet.ip_address != None:
                 return droplet.ip_address
