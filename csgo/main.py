@@ -154,7 +154,7 @@ class ServerManager(commands.Cog):
         while True:
             msg = await self.q.get()
             content = self.servers[msg[0]].get_status()[msg[1]]
-            if content == "None" or msg[1] == "droplet":
+            if content == None or msg[1] == "droplet":
                 return
             await self.channel.send(
                 f"update for **{msg[0]}.rdkr.uk**\n`{msg[1]}: {content}`"
