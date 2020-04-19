@@ -22,14 +22,14 @@
 			"name"			"competitive"
 			"maps"
 			{
-				"de_dust2"		""
+				"de_cache"		""
 				"de_mirage"		""
-				"de_vertigo"	""
-				"de_inferno"	""
 				"de_nuke"		""
+				"de_inferno"	""
+				"de_dust2"		""
 				"de_train"		""
                 "de_overpass"	""
-				"de_cache"		""
+				"de_vertigo"	""
 			}
 		}
 	}

@@ -97,17 +97,16 @@ class Server:
             await self.update(current=State.STOPPING)
 
     async def update(self, **kwargs):
-        for key, value in kwargs.items():
-            if self.__getattribute__(key) != value:
-                change = f"Δ{key}={value}"
-                self._report(f"; {change};")
-                await self.q.put((self.name, key))
-                self.__setattr__(key, value)
+        for key, new in kwargs.items():
+            old = self.__getattribute__(key)
+            if old != new:
+                self.__setattr__(key, new)
+                change = f"Δ{key}:{old}->{new}"
+                if not (key == 'droplet_info' and old and new and old.id == new.id):
+                    self.report(f"{change};")
+                    await self.q.put((self.name, key))
 
-    def _report(self, action):
-        print(f"{self._get_status()}; {action}")
-
-    def _get_status(self):
+    def get_status(self):
         if self.csgo:
             csgo = f"v{self.csgo_info.version}, {self.csgo_info.player_count}/{self.csgo_info.max_players}, {round(self.csgo_info.ping*1000)}ms"
         if self.droplet:
@@ -120,6 +119,8 @@ class Server:
             droplet=droplet if self.droplet else None,
         )
 
+    def report(self, action):
+        print(f"{list(self.get_status().values())}; {action}")
 
 class ServerManager(commands.Cog):
     def __init__(self, bot):
@@ -145,7 +146,7 @@ class ServerManager(commands.Cog):
     async def manager_status_loop(self):
         while True:
             msg = await self.q.get()
-            content = self.servers[msg[0]]._get_status()[msg[1]]
+            content = self.servers[msg[0]].get_status()[msg[1]]
             if content == 'None' or msg[1] == 'droplet':
                 return
             await self.channel.send(
@@ -175,8 +176,9 @@ class ServerManager(commands.Cog):
 
         for server in self.servers.values():
             droplet_info = droplets.get(server.name, False)
-            server.droplet_info = droplet_info
+            await server.update(droplet_info=droplet_info)
             await server.update(droplet=bool(droplet_info))
+
 
     @tasks.loop(seconds=10.0)
     async def manager_dns_loop(self):
@@ -214,12 +216,16 @@ class ServerManager(commands.Cog):
         for server in self.servers.values():
             await server.update_state()
 
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, exception):
+        await ctx.send(f'```Command error: {exception}```')
+
     @commands.command()
     async def status(self, ctx):
         for server in self.servers.values():
-            status = server._get_status()
+            status = server.get_status()
             status_items = "\n".join(
-                [f"{k}: {v}" for k, v in status.items() if k != "name"]
+                [f"{k.ljust(7, ' ')}: {v}" for k, v in status.items() if k != "name"]
             )
             msg = f'server status for **{status["name"]}.rdkr.uk**```{status_items}```'
             await ctx.send(msg)
