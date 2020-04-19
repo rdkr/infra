@@ -1,226 +1,245 @@
-import enum
+import asyncio
+import a2s
+import queue
+from enum import Enum
 import os
 import socket
 import time
 
 import digitalocean
 import discord
+from discord.ext import tasks, commands
 import jinja2
 
-client = discord.Client()
 
-
-@client.event
-async def on_ready():
-    print("We have logged in as {0.user}".format(client))
-    activity = discord.Activity(name="CSGO servers", type=discord.ActivityType.watching)
-    await client.change_presence(activity=activity)
-
-
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    if message.content.startswith("!help"):
-        await message.channel.send("_!start_ or _!stop_")
-
-    if message.content.startswith("!start"):
-        await servers["pug"].start(message)
-
-    if message.content.startswith("!stop"):
-        await servers["pug"].stop(message)
-
-
-class Status(enum.Enum):
-    STARTING = 1
+class State(Enum):
+    UNKNOWN = 0
+    OFF = 1
     ON = 2
-    OFF = 3
+    STARTING = 3
     STOPPING = 4
 
 
 class Server:
-    def __init__(self, name):
+    def __init__(self, name, q):
         self.name = name
-        self.state = None
+        self.q = q
 
-    async def start(self, message):
+        self.current = State.UNKNOWN
+        self.desired = State.UNKNOWN
+        self.droplet = False
+        self.droplet_info = None
+        self.csgo = False
+        self.csgo_info = None
 
-        print(f"start: got {message}")
+    async def update_csgo(self):
 
-        # cmd = message.content.split(" ")
-        # if len(cmd) != 2 or cmd[1] not in ["pug", "dm"]:
-        #     print(f"start: rejecting {message}")
-        #     return await message.channel.send("_!start pug_")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        csgo_conn = sock.connect_ex((f"{self.name}.rdkr.uk", 27015)) == 0
+        if csgo_conn:
+            self.csgo_info = a2s.info((f"{self.name}.rdkr.uk", 27015))
+        return await self.update(csgo=csgo_conn)
 
-        try:
+    async def update_state(self):
 
-            server = await self.create(message)
-            ip = await self.get_ip(message)
-            await self.set_dns(ip, message)
-            await self.wait_for_csgo(message)
+        if self.current == State.UNKNOWN:
+            if self.droplet and self.csgo:
+                await self.update(current=State.ON)
+            elif self.droplet and not self.csgo:
+                await self.update(current=State.STARTING)
+            else:
+                await self.update(current=State.OFF)
 
-            print("done")
+        if self.current in [State.STARTING] and self.csgo:
+            await self.update(current=State.ON)
 
-        except Exception as e:
-            await message.channel.send(
-                f":red_circle: [{self.name}.rdkr.uk] [csgo] error: {e}"
-            )
+        elif self.current in [State.ON] and not self.csgo:
+            await self.update(current=State.STARTING)
 
-    async def create(self, message):
+        elif self.current in [State.ON, State.STOPPING] and not self.droplet:
+            await self.update(current=State.OFF)
 
-        print(f"start: create")
+        if self.desired == State.ON:
+            if self.current in [State.OFF]:
+                await self.create()
+
+        if self.desired == State.OFF:
+            await self.destroy()
+
+    async def create(self):
 
         with open(f"{self.name}/cloud-config.yaml") as f:
             template = jinja2.Template(f.read())
             user_data = template.render(env=os.environ)
 
-        server = None
-        creating = False
-        manager = digitalocean.Manager(token=os.environ["DO_TOKEN"])
+        digitalocean.Droplet(
+            token=os.environ["DO_TOKEN"],
+            name=self.name,
+            region="lon1",
+            image="62093009",
+            size_slug="s-1vcpu-2gb",
+            ssh_keys=[
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGs5SOHcst8xy0Te3LR3/0fGIIYaTc3yLnts1ZZQLuvn neel@Neels-MBP"
+            ],
+            backups=False,
+            user_data=user_data,
+        ).create()
 
-        timeout = 120
-        while timeout != 0:
+        await self.update(current=State.STARTING)
 
-            for droplet in manager.get_all_droplets():
-                if droplet.name == self.name:
-                    await message.channel.send(
-                        f":green_circle: [{self.name}.rdkr.uk] [instance] exists"
-                    )
-                    return droplet
+    async def destroy(self):
+        if self.droplet:
+            try:
+                self.droplet_info.destroy()
+            except digitalocean.baseapi.NotFoundError:
+                pass
+            await self.update(current=State.STOPPING)
 
-            if not server and not creating:
-                await message.channel.send(
-                    f":white_circle: [{self.name}.rdkr.uk] [instance] not found - creating..."
-                )
+    async def update(self, **kwargs):
+        for key, value in kwargs.items():
+            if self.__getattribute__(key) != value:
+                change = f"Δ{key}={value}"
+                self._report(f"; {change};")
+                await self.q.put((self.name, key))
+                self.__setattr__(key, value)
 
-                creating = True
+    def _report(self, action):
+        print(f"{self._get_status()}; {action}")
 
-                droplet = digitalocean.Droplet(
-                    token=os.environ["DO_TOKEN"],
-                    name=self.name,
-                    region="lon1",
-                    image="62093009",
-                    size_slug="s-1vcpu-2gb",
-                    ssh_keys=[
-                        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGs5SOHcst8xy0Te3LR3/0fGIIYaTc3yLnts1ZZQLuvn neel@Neels-MBP"
-                    ],
-                    backups=False,
-                    user_data=user_data,
-                )
-                droplet.create()
-
-            if timeout % 24 == 0:
-                await message.channel.send(
-                    f":white_circle: [{self.name}.rdkr.uk] [instance] waiting for start..."
-                )
-
-            timeout = timeout - 1
-            time.sleep(5)
-
-        else:
-            raise Exception("instance not found before timeout")
-
-    async def get_ip(self, message):
-
-        print(f"start: get_ip")
-
-        manager = digitalocean.Manager(token=os.environ["DO_TOKEN"])
-
-        timeout = 120
-        while timeout != 0:
-
-            for droplet in manager.get_all_droplets():
-                if droplet.name == self.name:
-                    break
-
-            if droplet.ip_address != None:
-                return droplet.ip_address
-
-            if timeout % 24 == 0:
-                await message.channel.send(
-                    f":white_circle: [{self.name}.rdkr.uk] [dns] waiting for ip..."
-                )
-
-            timeout = timeout - 1
-            time.sleep(5)
-
-        else:
-            raise Exception("ip not found before timeout")
-
-    async def set_dns(self, ip, message):
-
-        print(f"start: set_dns")
-
-        domain = digitalocean.Domain(
-            token=os.environ["DO_TOKEN"], name=f"{self.name}.rdkr.uk"
+    def _get_status(self):
+        if self.csgo:
+            csgo = f"v{self.csgo_info.version}, {self.csgo_info.player_count}/{self.csgo_info.max_players}, {round(self.csgo_info.ping*1000)}ms"
+        if self.droplet:
+            droplet = self.droplet_info.id
+        return dict(
+            name=self.name,
+            current=f"{self.current}",
+            desired=f"{self.desired}",
+            csgo=csgo if self.csgo else None,
+            droplet=droplet if self.droplet else None,
         )
 
-        records = domain.get_records()
-        for r in records:
-            if r.type == "A":
-                r.destroy()
 
-        domain.create_new_domain_record(type="A", name="@", ttl=60, data=ip)
+class ServerManager(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
-        await message.channel.send(
-            f":green_circle: [{self.name}.rdkr.uk] [dns] set to {ip}"
-        )
+        self.q = asyncio.Queue()
 
-    async def wait_for_csgo(self, message):
+        self.servers = {"pug": Server("pug", self.q), "dm": Server("dm", self.q)}
+        self.channel = self.bot.get_channel(701189984132136990)
 
-        print(f"start: wait_for_csgo")
+        self.tasks = [
+            self.manager_status_loop,
+            self.manager_droplet_loop,
+            self.manager_dns_loop,
+            self.servers_csgo_loop,
+            self.servers_status_loop,
+        ]
 
-        timeout = 120
-        while timeout != 0:
+        for task in self.tasks:
+            task.start()
 
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
-            result = sock.connect_ex((f"{self.name}.rdkr.uk", 27015))
-
-            if result == 0:
-                await message.channel.send(
-                    f":green_circle: [{self.name}.rdkr.uk] [csgo] appears to be alive"
-                )
+    @tasks.loop(loop=None)
+    async def manager_status_loop(self):
+        while True:
+            msg = await self.q.get()
+            content = self.servers[msg[0]]._get_status()[msg[1]]
+            if content == 'None' or msg[1] == 'droplet':
                 return
+            await self.channel.send(
+                f"update for **{msg[0]}.rdkr.uk**\n`{msg[1]}: {content}`"
+            )
 
-            if timeout % 24 == 0:
-                await message.channel.send(
-                    f":white_circle: [{self.name}.rdkr.uk] [csgo] waiting for server..."
+    # @tasks.loop(seconds=10.0)
+    # async def manager_status_loop(self):
+    #     activity = discord.Activity(
+    #         name=f"{len(self.servers)} CSGO servers", type=discord.ActivityType.watching
+    #     )
+    #     await self.bot.change_presence(activity=activity)
+
+    @tasks.loop(seconds=10.0, reconnect=False)
+    async def manager_droplet_loop(self):
+
+        droplets_list = digitalocean.Manager(
+            token=os.environ["DO_TOKEN"]
+        ).get_all_droplets()
+
+        if len(droplets_list) > 3:
+            print(f"emergency stopping {len(droplets_list)} droplets")
+            for d in droplets_list:
+                d.destroy()
+
+        droplets = {d.name: d for d in droplets_list}
+
+        for server in self.servers.values():
+            droplet_info = droplets.get(server.name, False)
+            server.droplet_info = droplet_info
+            await server.update(droplet=bool(droplet_info))
+
+    @tasks.loop(seconds=10.0)
+    async def manager_dns_loop(self):
+        for name, server in self.servers.items():
+
+            if not server.droplet or not server.droplet_info.ip_address:
+                continue
+
+            domain = digitalocean.Domain(
+                token=os.environ["DO_TOKEN"], name=f"{name}.rdkr.uk"
+            )
+            correct = False
+            for r in domain.get_records():
+                if r.type == "A":
+                    if r.data == server.droplet_info.ip_address:
+                        correct = True
+                    else:
+                        print(f"dns {name} destroy: {r}")
+                        r.destroy()
+
+            if not correct:
+                record = dict(
+                    type="A", name="@", ttl=60, data=server.droplet_info.ip_address
                 )
+                print(f"dns {name} create: {record}")
+                domain.create_new_domain_record(**record)
 
-            timeout = timeout - 1
-            time.sleep(5)
+    @tasks.loop(seconds=10.0)
+    async def servers_csgo_loop(self):
+        for server in self.servers.values():
+            await server.update_csgo()
 
-        else:
-            raise Exception("is not alive before timeout")
+    @tasks.loop(seconds=1, reconnect=False)
+    async def servers_status_loop(self):
+        for server in self.servers.values():
+            await server.update_state()
 
-    async def stop(self, message):
-
-        print(f"stop: got {message}")
-
-        try:
-
-            manager = digitalocean.Manager(token=os.environ["DO_TOKEN"])
-            my_droplets = manager.get_all_droplets()
-
-            for droplet in my_droplets:
-                if droplet.name == self.name:
-                    await message.channel.send(
-                        f":white_circle: [{self.name}.rdkr.uk] destroying..."
-                    )
-                    droplet.destroy()
-                    return  # todo check this worked
-
-            await message.channel.send(
-                f":green_circle: [{self.name}.rdkr.uk] not found"
+    @commands.command()
+    async def status(self, ctx):
+        for server in self.servers.values():
+            status = server._get_status()
+            status_items = "\n".join(
+                [f"{k}: {v}" for k, v in status.items() if k != "name"]
             )
+            msg = f'server status for **{status["name"]}.rdkr.uk**```{status_items}```'
+            await ctx.send(msg)
 
-        except Exception as e:
-            await message.channel.send(
-                f":red_circle: [{self.name}.rdkr.uk] [csgo] error: {e}"
-            )
+    @commands.command()
+    async def start(self, ctx, server_name):
+        await self.servers[server_name].update(desired=State.ON)
+
+    @commands.command()
+    async def stop(self, ctx, server_name):
+        await self.servers[server_name].update(desired=State.OFF)
 
 
-servers = {"pug": Server("pug")}
-client.run(os.environ["DISCORD_TOKEN"])
+bot = commands.Bot(command_prefix="!")
+
+
+@bot.event
+async def on_ready():
+    print("We have logged in as {0.user}".format(bot))
+    bot.add_cog(ServerManager(bot))
+
+
+bot.run(os.environ["DISCORD_TOKEN"])

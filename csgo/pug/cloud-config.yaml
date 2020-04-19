@@ -1,5 +1,5 @@
 ## template: jinja
-#cloud-config 
+#cloud-config
 
 fqdn: pug.rdkr.uk
 hostname: pug.rdkr.uk
@@ -19,14 +19,13 @@ write_files:
     content: |
       #!/usr/bin/env sh
 
+      ./csgoserver force-update
+
       wget -nc https://mms.alliedmods.net/mmsdrop/1.10/mmsource-1.10.7-git971-linux.tar.gz
       tar xfv mmsource-1.10.7-git971-linux.tar.gz -C serverfiles/csgo
 
       wget -nc https://sm.alliedmods.net/smdrop/1.10/sourcemod-1.10.0-git6482-linux.tar.gz
       tar xfv sourcemod-1.10.0-git6482-linux.tar.gz -C serverfiles/csgo
-
-      mv serverfiles/csgo/addons/sourcemod/plugins/nextmap.smx serverfiles/csgo/addons/sourcemod/plugins/disabled/
-      mv serverfiles/csgo/addons/sourcemod/plugins/fun* serverfiles/csgo/addons/sourcemod/plugins/disabled
 
       wget -nc https://github.com/splewis/csgo-pug-setup/releases/download/2.0.5/pugsetup_2.0.5.zip
       unzip pugsetup_2.0.5.zip -d serverfiles/csgo/
@@ -34,19 +33,22 @@ write_files:
       wget -nc https://github.com/splewis/csgo-practice-mode/releases/download/1.3.3/practicemode_1.3.3.zip
       unzip -o practicemode_1.3.3.zip -d serverfiles/csgo/
 
+      mv serverfiles/csgo/addons/sourcemod/plugins/nextmap.smx serverfiles/csgo/addons/sourcemod/plugins/disabled/
+      mv serverfiles/csgo/addons/sourcemod/plugins/fun* serverfiles/csgo/addons/sourcemod/plugins/disabled
+
       csgo=/home/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
-    
+
       wget -O ${csgo}/cfg/gamemode_competitive_server.cfg ${github}/pug/gamemode_competitive_server.cfg
-      wget -O ${csgo}/addons/sourcemod/configs/admins_simple.ini ${github}/admins_simple.ini 
+      wget -O ${csgo}/addons/sourcemod/configs/admins_simple.ini ${github}/admins_simple.ini
       wget -O ${csgo}/gamemodes_server.txt ${github}/pug/gamemodes_server.txt
 
   - path: /home/csgo/lgsm/config-lgsm/csgoserver/csgoserver.cfg
     owner: csgo:csgo
     content: |
-      
+
       ip={% raw %}{{ ds.meta_data.interfaces.public[0].ipv4.ip_address }}{% endraw %}
-      
+
       gametype="0"
       gamemode="1"
 
@@ -56,7 +58,7 @@ write_files:
       maxplayers="10"
       tickrate="128"
 
-      gslt="{{ env.CSGO_GSLT_TOKEN }}"
+      gslt="{{ env.CSGO_GSLT_TOKEN_PUG }}"
 
       updateonstart="on"
 
@@ -66,7 +68,7 @@ write_files:
       rcon_password "{{ env.CSGO_RCON_PASSWORD }}"
       sv_password "{{ env.CSGO_SV_PASSWORD }}"
       hostname "pug.rdkr.uk"
-      
+
       host_info_show 2
       host_players_show 2
 
