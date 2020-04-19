@@ -11,6 +11,9 @@ import discord
 from discord.ext import tasks, commands
 import jinja2
 
+ADMIN = 666716587083956224
+HERMES = 701189984132136990
+
 
 class State(Enum):
     UNKNOWN = 0
@@ -30,6 +33,7 @@ class Server:
         self.droplet = None
         self.csgo = False
         self.csgo_info = None
+        self.inactive = 0
 
     async def update_csgo(self):
 
@@ -53,11 +57,19 @@ class Server:
         if self.current in [State.STARTING] and self.csgo:
             await self.update(current=State.ON)
 
-        elif self.current in [State.ON] and not self.csgo:
-            await self.update(current=State.STARTING)
-
         elif self.current in [State.ON, State.STOPPING] and not self.droplet:
             await self.update(current=State.OFF)
+
+        elif self.current in [State.ON] and self.csgo:
+            if self.csgo_info.player_count > 0:
+                self.inactive = 0
+            elif self.inactive > 60 * 15:
+                await self.update(desired=State.OFF)
+            else:
+                self.inactive = self.inactive + 1
+
+        elif self.current in [State.ON] and not self.csgo:
+            await self.update(current=State.STARTING)
 
         if self.desired == State.ON:
             if self.current in [State.OFF]:
@@ -74,7 +86,7 @@ class Server:
 
         digitalocean.Droplet(
             token=os.environ["DO_TOKEN"],
-            name=self.name,
+            name=f"csgo-{self.name}",
             region="lon1",
             image="62093009",
             size_slug="s-1vcpu-2gb",
@@ -101,13 +113,13 @@ class Server:
             if old != new:
                 self.__setattr__(key, new)
                 change = f"Δ{key}:{old}->{new}"
-                if not (key == 'droplet' and old and new and old.id == new.id):
+                if not (key == "droplet" and old and new and old.id == new.id):
                     self.report(f"{change};")
                     await self.q.put((self.name, key))
 
     def get_status(self):
         if self.csgo:
-            csgo = f"v{self.csgo_info.version}, {self.csgo_info.player_count}/{self.csgo_info.max_players}, {round(self.csgo_info.ping*1000)}ms"
+            csgo = f"v{self.csgo_info.version}, {self.csgo_info.player_count}/{self.csgo_info.max_players}, {round(self.csgo_info.ping*1000)}ms, {self.inactive}"
         if self.droplet:
             droplet = self.droplet.id
         return dict(
@@ -121,6 +133,7 @@ class Server:
     def report(self, action):
         print(f"{list(self.get_status().values())}; {action}")
 
+
 class ServerManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -128,36 +141,24 @@ class ServerManager(commands.Cog):
         self.q = asyncio.Queue()
 
         self.servers = {"pug": Server("pug", self.q), "dm": Server("dm", self.q)}
-        self.channel = self.bot.get_channel(701189984132136990)
+        self.channel = self.bot.get_channel(ADMIN)
 
-        self.tasks = [
-            # self.manager_status_loop,
-            self.manager_droplet_loop,
-            self.manager_dns_loop,
-            self.servers_csgo_loop,
-            self.servers_status_loop,
-        ]
-
-        for task in self.tasks:
-            task.start()
+        self.manager_status_loop.start()
+        self.manager_droplet_loop.start()
+        self.manager_dns_loop.start()
+        self.servers_csgo_loop.start()
+        self.servers_status_loop.start()
 
     @tasks.loop(loop=None)
     async def manager_status_loop(self):
         while True:
             msg = await self.q.get()
             content = self.servers[msg[0]].get_status()[msg[1]]
-            if content == 'None' or msg[1] == 'droplet':
+            if content == "None" or msg[1] == "droplet":
                 return
             await self.channel.send(
                 f"update for **{msg[0]}.rdkr.uk**\n`{msg[1]}: {content}`"
             )
-
-    # @tasks.loop(seconds=10.0)
-    # async def manager_status_loop(self):
-    #     activity = discord.Activity(
-    #         name=f"{len(self.servers)} CSGO servers", type=discord.ActivityType.watching
-    #     )
-    #     await self.bot.change_presence(activity=activity)
 
     @tasks.loop(seconds=10.0, reconnect=False)
     async def manager_droplet_loop(self):
@@ -166,17 +167,18 @@ class ServerManager(commands.Cog):
             token=os.environ["DO_TOKEN"]
         ).get_all_droplets()
 
-        if len(droplets_list) > 3:
+        csgo_list = [d for d in droplets_list if d.name.startswith("csgo")]
+
+        if len(csgo_list) > 2:
             print(f"emergency stopping {len(droplets_list)} droplets")
-            for d in droplets_list:
+            for d in csgo_list:
                 d.destroy()
 
-        droplets = {d.name: d for d in droplets_list}
+        droplets = {d.name.replace("csgo-", ""): d for d in csgo_list}
 
         for server in self.servers.values():
             droplet = droplets.get(server.name, None)
             await server.update(droplet=droplet)
-
 
     @tasks.loop(seconds=10.0)
     async def manager_dns_loop(self):
@@ -215,8 +217,13 @@ class ServerManager(commands.Cog):
             await server.update_state()
 
     @commands.Cog.listener()
+    async def on_message(self, message):
+        channel = ADMIN if message.channel == ADMIN else HERMES
+        self.channel = self.bot.get_channel(channel)
+
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, exception):
-        await ctx.send(f'```Command error: {exception}```')
+        await ctx.send(f"```Command error: {exception}```")
 
     @commands.command()
     async def status(self, ctx):
