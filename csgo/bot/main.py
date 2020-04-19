@@ -69,7 +69,7 @@ class Server:
 
     async def create(self):
 
-        with open(f"{self.name}/cloud-config.yaml") as f:
+        with open(f"../{self.name}/cloud-config.yaml") as f:
             template = jinja2.Template(f.read())
             user_data = template.render(env=os.environ)
 
