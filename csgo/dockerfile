@@ -1,9 +1,9 @@
 FROM python
 
-RUN pip install discord.py python-digitalocean jinja2
+RUN pip install discord.py python-digitalocean jinja2 python-a2s
 
 WORKDIR /usr/src/app
 
 COPY . .
 
-CMD [ "python", "./main.py" ]
+CMD [ "python", "-X=dev", "./main.py" ]
