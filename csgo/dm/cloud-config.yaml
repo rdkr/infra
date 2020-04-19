@@ -18,7 +18,7 @@ write_files:
       csgo=/home/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
 
-      wget s3://neel.rdkr.uk/csgo/dm.tar.gz
+      wget https://neel.rdkr.uk/csgo/dm.tar.gz
       tar xf dm.tar.gz -C $csgo
 
       wget -O ${csgo}/cfg/gamemode_competitive_server.cfg ${github}/dm/gamemode_competitive_server.cfg

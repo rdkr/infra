@@ -69,7 +69,7 @@ class Server:
 
     async def create(self):
 
-        with open(f"../{self.name}/cloud-config.yaml") as f:
+        with open(f"{self.name}/cloud-config.yaml") as f:
             template = jinja2.Template(f.read())
             user_data = template.render(env=os.environ)
 
@@ -131,7 +131,7 @@ class ServerManager(commands.Cog):
         self.channel = self.bot.get_channel(701189984132136990)
 
         self.tasks = [
-            self.manager_status_loop,
+            # self.manager_status_loop,
             self.manager_droplet_loop,
             self.manager_dns_loop,
             self.servers_csgo_loop,
