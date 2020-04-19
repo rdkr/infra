@@ -13,10 +13,10 @@ write_files:
     content: |
       #!/usr/bin/env sh
 
-      ./csgoserver force-update
-
       csgo=/home/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
+
+      $csgo/csgoserver force-update
 
       wget https://neel.rdkr.uk/csgo/dm.tar.gz
       tar xf dm.tar.gz -C $csgo

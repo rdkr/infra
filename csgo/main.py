@@ -27,8 +27,7 @@ class Server:
 
         self.current = State.UNKNOWN
         self.desired = State.UNKNOWN
-        self.droplet = False
-        self.droplet_info = None
+        self.droplet = None
         self.csgo = False
         self.csgo_info = None
 
@@ -91,7 +90,7 @@ class Server:
     async def destroy(self):
         if self.droplet:
             try:
-                self.droplet_info.destroy()
+                self.droplet.destroy()
             except digitalocean.baseapi.NotFoundError:
                 pass
             await self.update(current=State.STOPPING)
@@ -102,7 +101,7 @@ class Server:
             if old != new:
                 self.__setattr__(key, new)
                 change = f"Δ{key}:{old}->{new}"
-                if not (key == 'droplet_info' and old and new and old.id == new.id):
+                if not (key == 'droplet' and old and new and old.id == new.id):
                     self.report(f"{change};")
                     await self.q.put((self.name, key))
 
@@ -110,7 +109,7 @@ class Server:
         if self.csgo:
             csgo = f"v{self.csgo_info.version}, {self.csgo_info.player_count}/{self.csgo_info.max_players}, {round(self.csgo_info.ping*1000)}ms"
         if self.droplet:
-            droplet = self.droplet_info.id
+            droplet = self.droplet.id
         return dict(
             name=self.name,
             current=f"{self.current}",
@@ -175,16 +174,15 @@ class ServerManager(commands.Cog):
         droplets = {d.name: d for d in droplets_list}
 
         for server in self.servers.values():
-            droplet_info = droplets.get(server.name, False)
-            await server.update(droplet_info=droplet_info)
-            await server.update(droplet=bool(droplet_info))
+            droplet = droplets.get(server.name, None)
+            await server.update(droplet=droplet)
 
 
     @tasks.loop(seconds=10.0)
     async def manager_dns_loop(self):
         for name, server in self.servers.items():
 
-            if not server.droplet or not server.droplet_info.ip_address:
+            if not server.droplet or not server.droplet.ip_address:
                 continue
 
             domain = digitalocean.Domain(
@@ -193,7 +191,7 @@ class ServerManager(commands.Cog):
             correct = False
             for r in domain.get_records():
                 if r.type == "A":
-                    if r.data == server.droplet_info.ip_address:
+                    if r.data == server.droplet.ip_address:
                         correct = True
                     else:
                         print(f"dns {name} destroy: {r}")
@@ -201,7 +199,7 @@ class ServerManager(commands.Cog):
 
             if not correct:
                 record = dict(
-                    type="A", name="@", ttl=60, data=server.droplet_info.ip_address
+                    type="A", name="@", ttl=60, data=server.droplet.ip_address
                 )
                 print(f"dns {name} create: {record}")
                 domain.create_new_domain_record(**record)
