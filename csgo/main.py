@@ -63,7 +63,7 @@ class Server:
         elif self.current in [State.ON] and self.csgo:
             if self.csgo_info.player_count > 0:
                 self.inactive = 0
-            elif self.inactive > 60 * 15:
+            elif self.inactive > 60 * 60:
                 await self.update(desired=State.OFF)
             else:
                 self.inactive = self.inactive + 1

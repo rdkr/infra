@@ -22,7 +22,7 @@ write_files:
       csgo=/home/csgo/serverfiles/csgo
       github=https://raw.githubusercontent.com/rdkr/infra/master/csgo
 
-      $csgo/csgoserver force-update
+      /home/csgo/csgoserver force-update
 
       wget https://neel.rdkr.uk/csgo/pug.tar.gz
       tar xf pug.tar.gz -C $csgo
