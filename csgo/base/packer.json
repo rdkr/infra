@@ -8,7 +8,7 @@
       "api_token": "{{ user `do_token` }}",
       "snapshot_name": "csgo-{{ isotime \"2006-01-02\" }}",
       "region": "lon1",
-      "image": "ubuntu-18-04-x64",
+      "image": "62093009",
       "size": "s-1vcpu-2gb",
       "ssh_username": "root",
       "user_data_file": "/packer/cloud-config.yaml"

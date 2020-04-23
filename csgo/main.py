@@ -13,6 +13,7 @@ import jinja2
 
 ADMIN = 666716587083956224
 HERMES = 701189984132136990
+INACTIVE_TIME = 60 * 60
 
 
 class State(Enum):
@@ -63,7 +64,7 @@ class Server:
         elif self.current in [State.ON] and self.csgo:
             if self.csgo_info.player_count > 0:
                 self.inactive = 0
-            elif self.inactive > 60 * 60:
+            elif self.inactive > INACTIVE_TIME:
                 await self.update(desired=State.OFF)
             else:
                 self.inactive = self.inactive + 1
@@ -88,7 +89,7 @@ class Server:
             token=os.environ["DO_TOKEN"],
             name=f"csgo-{self.name}",
             region="lon1",
-            image="62093009",
+            image="62537048",
             size_slug="s-1vcpu-2gb",
             ssh_keys=[
                 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGs5SOHcst8xy0Te3LR3/0fGIIYaTc3yLnts1ZZQLuvn neel@Neels-MBP"
@@ -119,7 +120,13 @@ class Server:
 
     def get_status(self):
         if self.csgo:
-            csgo = f"v{self.csgo_info.version}, {self.csgo_info.player_count}/{self.csgo_info.max_players}, {round(self.csgo_info.ping*1000)}ms, {self.inactive}"
+            info = [
+                f"v{self.csgo_info.version}",
+                f" {self.csgo_info.player_count}/{self.csgo_info.max_players}",
+                f" {round(self.csgo_info.ping*1000)}ms",
+                f" {self.inactive}/{INACTIVE_TIME}",
+            ]
+            csgo = ",".join(info)
         if self.droplet:
             droplet = self.droplet.id
         return dict(
@@ -218,7 +225,7 @@ class ServerManager(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        channel = ADMIN if message.channel == ADMIN else HERMES
+        channel = ADMIN if message.channel.id == ADMIN else HERMES
         self.channel = self.bot.get_channel(channel)
 
     @commands.Cog.listener()

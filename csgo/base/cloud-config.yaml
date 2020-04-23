@@ -1,4 +1,4 @@
-#cloud-config 
+#cloud-config
 
 users:
   - name: csgo
@@ -16,7 +16,7 @@ write_files:
       Description=csgo
       After=network-online.target
       Wants=network-online.target
-      
+
       [Service]
       Type=forking
       User=csgo
@@ -24,8 +24,9 @@ write_files:
       ExecStartPre=/home/csgo/pre-start.sh
       ExecStart=/home/csgo/csgoserver start
       ExecStop=/home/csgo/csgoserver stop
+      TimeoutStartSec=infinity
       Restart=no
       RemainAfterExit=yes
-      
+
       [Install]
       WantedBy=multi-user.target
