@@ -1,19 +1,26 @@
 import asyncio
+from aiohttp import web
 import a2s
-import queue
 from enum import Enum
 import os
 import socket
-import time
 
 import digitalocean
 import discord
 from discord.ext import tasks, commands
 import jinja2
 
-ADMIN = 666716587083956224
-HERMES = 701189984132136990
-INACTIVE_TIME = 60 * 60
+
+def loop(time):
+    def timer(f):
+        async def looper(*args, **kwargs):
+            while True:
+                await f(*args, **kwargs)
+                await asyncio.sleep(time)
+
+        return looper
+
+    return timer
 
 
 class State(Enum):
@@ -35,6 +42,7 @@ class Server:
         self.csgo = False
         self.csgo_info = None
         self.inactive = 0
+        self.max_inactive = 3600
 
     async def update_csgo(self):
 
@@ -64,7 +72,7 @@ class Server:
         elif self.current in [State.ON] and self.csgo:
             if self.csgo_info.player_count > 0:
                 self.inactive = 0
-            elif self.inactive > INACTIVE_TIME:
+            elif self.inactive > self.max_inactive:
                 await self.update(desired=State.OFF)
             else:
                 self.inactive = self.inactive + 1
@@ -119,55 +127,36 @@ class Server:
                     await self.q.put((self.name, key))
 
     def get_status(self):
-        if self.csgo:
-            info = [
-                f"v{self.csgo_info.version}",
-                f" {self.csgo_info.player_count}/{self.csgo_info.max_players}",
-                f" {round(self.csgo_info.ping*1000)}ms",
-                f" {self.inactive}/{INACTIVE_TIME}",
-            ]
-            csgo = ",".join(info)
-        if self.droplet:
-            droplet = self.droplet.id
         return dict(
-            name=self.name,
-            current=f"{self.current}",
-            desired=f"{self.desired}",
-            csgo=csgo if self.csgo else None,
-            droplet=droplet if self.droplet else None,
+            current=self.current.value,
+            desired=self.desired.value,
+            csgo_version=int(self.csgo_info.version.replace(".", "")) if self.csgo else -1,
+            csgo_player_count=self.csgo_info.player_count if self.csgo else -1,
+            csgo_max_players=self.csgo_info.max_players if self.csgo else -1,
+            csgo_ping=self.csgo_info.ping if self.csgo else -1,
+            csgo_inactive=self.inactive,
+            csgo_max_inactive=self.max_inactive,
+            droplet=self.droplet.id if self.droplet else -1,
         )
 
     def report(self, action):
         print(f"{list(self.get_status().values())}; {action}")
 
 
-class ServerManager(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+class ServerManager:
+    def __init__(self):
 
         self.q = asyncio.Queue()
 
         self.servers = {"pug": Server("pug", self.q), "dm": Server("dm", self.q)}
-        self.channel = self.bot.get_channel(ADMIN)
 
-        self.manager_status_loop.start()
-        self.manager_droplet_loop.start()
-        self.manager_dns_loop.start()
-        self.servers_csgo_loop.start()
-        self.servers_status_loop.start()
+    async def start(self, app):
+        asyncio.create_task(self.manager_droplet_loop())
+        asyncio.create_task(self.manager_dns_loop())
+        asyncio.create_task(self.servers_csgo_loop())
+        asyncio.create_task(self.servers_status_loop())
 
-    @tasks.loop(loop=None)
-    async def manager_status_loop(self):
-        while True:
-            msg = await self.q.get()
-            content = self.servers[msg[0]].get_status()[msg[1]]
-            if content == None or msg[1] == "droplet":
-                return
-            await self.channel.send(
-                f"update for **{msg[0]}.rdkr.uk**\n`{msg[1]}: {content}`"
-            )
-
-    @tasks.loop(seconds=10.0, reconnect=False)
+    @loop(10)
     async def manager_droplet_loop(self):
 
         droplets_list = digitalocean.Manager(
@@ -187,7 +176,7 @@ class ServerManager(commands.Cog):
             droplet = droplets.get(server.name, None)
             await server.update(droplet=droplet)
 
-    @tasks.loop(seconds=10.0)
+    @loop(10)
     async def manager_dns_loop(self):
         for name, server in self.servers.items():
 
@@ -213,51 +202,49 @@ class ServerManager(commands.Cog):
                 print(f"dns {name} create: {record}")
                 domain.create_new_domain_record(**record)
 
-    @tasks.loop(seconds=10.0)
+    @loop(10)
     async def servers_csgo_loop(self):
         for server in self.servers.values():
             await server.update_csgo()
 
-    @tasks.loop(seconds=1, reconnect=False)
+    @loop(10)
     async def servers_status_loop(self):
         for server in self.servers.values():
             await server.update_state()
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        channel = ADMIN if message.channel.id == ADMIN else HERMES
-        self.channel = self.bot.get_channel(channel)
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, exception):
-        await ctx.send(f"```Command error: {exception}```")
-
-    @commands.command()
-    async def status(self, ctx):
-        for server in self.servers.values():
-            status = server.get_status()
-            status_items = "\n".join(
-                [f"{k.ljust(7, ' ')}: {v}" for k, v in status.items() if k != "name"]
-            )
-            msg = f'server status for **{status["name"]}.rdkr.uk**```{status_items}```'
-            await ctx.send(msg)
-
-    @commands.command()
-    async def start(self, ctx, server_name):
-        await self.servers[server_name].update(desired=State.ON)
-
-    @commands.command()
-    async def stop(self, ctx, server_name):
-        await self.servers[server_name].update(desired=State.OFF)
+async def metrics(request):
+    msgs = []
+    for server in request.app["manager"].servers.values():
+        status = server.get_status()
+        for k, v in status.items():
+            msgs.append(f'{k}{{name="{server.name}"}} {v}')
+    return web.Response(text="\n".join(msgs))
 
 
-bot = commands.Bot(command_prefix="!")
+async def start(request):
+    await request.app["manager"].servers[request.match_info.get("name")].update(
+        desired=State.ON
+    )
+    return web.Response()
 
 
-@bot.event
-async def on_ready():
-    print("We have logged in as {0.user}".format(bot))
-    bot.add_cog(ServerManager(bot))
+async def stop(request):
+    await request.app["manager"].servers[request.match_info.get("name")].update(
+        desired=State.OFF
+    )
+    return web.Response()
 
+if __name__ == "__main__":
 
-bot.run(os.environ["DISCORD_TOKEN"])
+    app = web.Application()
+    app["manager"] = ServerManager()
+    app.on_startup.append(app["manager"].start)
+    app.add_routes(
+        [
+            web.get("/metrics", metrics),
+            web.post("/start/{name}", start),
+            web.post("/stop/{name}", stop),
+        ]
+    )
+    web.run_app(app)

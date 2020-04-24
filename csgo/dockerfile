@@ -1,6 +1,6 @@
 FROM python
 
-RUN pip install discord.py python-digitalocean jinja2 python-a2s
+RUN pip install discord.py python-digitalocean jinja2 python-a2s aiohttp prometheus_client
 
 WORKDIR /usr/src/app
 
