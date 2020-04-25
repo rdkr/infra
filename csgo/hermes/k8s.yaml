@@ -1,5 +1,5 @@
 ---
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hermes
@@ -20,7 +20,36 @@ spec:
         - name: http
           containerPort: 8080
         env:
-
+          - name: DO_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: hermes
+                key: DO_TOKEN
+          - name: CSGO_GSLT_TOKEN_DM
+            valueFrom:
+              secretKeyRef:
+                name: hermes
+                key: CSGO_GSLT_TOKEN_DM
+          - name: CSGO_GSLT_TOKEN_PUG
+            valueFrom:
+              secretKeyRef:
+                name: hermes
+                key: username
+          - name: CSGO_WEB_TOKEN_DM
+            valueFrom:
+              secretKeyRef:
+                name: hermes
+                key: CSGO_WEB_TOKEN_DM
+          - name: CSGO_RCON_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: hermes
+                key: CSGO_RCON_PASSWORD
+          - name: CSGO_SV_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: hermes
+                key: CSGO_SV_PASSWORD
 
 ---
 apiVersion: v1

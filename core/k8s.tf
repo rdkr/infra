@@ -48,6 +48,7 @@ resource "kubernetes_secret" "hermes" {
 
   }
   data = {
+    "DO_TOKEN" = var.do_token
     "CSGO_GSLT_TOKEN_DM"  = var.CSGO_GSLT_TOKEN_DM
     "CSGO_GSLT_TOKEN_PUG" = var.CSGO_GSLT_TOKEN_PUG
     "CSGO_WEB_TOKEN_DM"   = var.CSGO_WEB_TOKEN_DM
