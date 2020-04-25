@@ -11,7 +11,6 @@ resource "digitalocean_kubernetes_cluster" "cluster" {
     size       = "s-1vcpu-2gb"
     node_count = 1
   }
-
 }
 
 resource "digitalocean_kubernetes_node_pool" "default" {
@@ -30,18 +29,29 @@ provider "kubernetes" {
   )
 }
 
-provider "helm" {
-  kubernetes {
-    load_config_file = false
-    host             = digitalocean_kubernetes_cluster.cluster.endpoint
-    token            = digitalocean_kubernetes_cluster.cluster.kube_config[0].token
-    cluster_ca_certificate = base64decode(
-      digitalocean_kubernetes_cluster.cluster.kube_config[0].cluster_ca_certificate
-    )
+resource "kubernetes_namespace" "hermes" {
+  metadata {
+    name = "hermes"
   }
 }
 
-data "helm_repository" "stable" {
-  name = "stable"
-  url  = "https://kubernetes-charts.storage.googleapis.com"
+resource "kubernetes_namespace" "concourse" {
+  metadata {
+    name = "concourse"
+  }
+}
+
+resource "kubernetes_secret" "hermes" {
+  metadata {
+    name      = "hermes"
+    namespace = kubernetes_namespace.hermes.metadata[0].name
+
+  }
+  data = {
+    "CSGO_GSLT_TOKEN_DM"  = var.CSGO_GSLT_TOKEN_DM
+    "CSGO_GSLT_TOKEN_PUG" = var.CSGO_GSLT_TOKEN_PUG
+    "CSGO_WEB_TOKEN_DM"   = var.CSGO_WEB_TOKEN_DM
+    "CSGO_RCON_PASSWORD"  = var.CSGO_RCON_PASSWORD
+    "CSGO_SV_PASSWORD"    = var.CSGO_SV_PASSWORD
+  }
 }
