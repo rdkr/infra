@@ -23,8 +23,8 @@ graf:
 		 grafana/grafana
 
 install:
-	# kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/bundle.yaml
-	# helm repo add stable https://kubernetes-charts.storage.googleapis.com
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/bundle.yaml
+	helm repo add stable https://kubernetes-charts.storage.googleapis.com
 	helm upgrade --install \
 		--set sidecar.datasources.enabled=true \
 		grafana stable/grafana

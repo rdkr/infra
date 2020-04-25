@@ -30,8 +30,18 @@ provider "kubernetes" {
   )
 }
 
-resource "kubernetes_namespace" "concourse" {
-  metadata {
-    name = "concourse"
+provider "helm" {
+  kubernetes {
+    load_config_file = false
+    host             = digitalocean_kubernetes_cluster.cluster.endpoint
+    token            = digitalocean_kubernetes_cluster.cluster.kube_config[0].token
+    cluster_ca_certificate = base64decode(
+      digitalocean_kubernetes_cluster.cluster.kube_config[0].cluster_ca_certificate
+    )
   }
+}
+
+data "helm_repository" "stable" {
+  name = "stable"
+  url  = "https://kubernetes-charts.storage.googleapis.com"
 }

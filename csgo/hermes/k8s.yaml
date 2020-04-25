@@ -15,9 +15,12 @@ spec:
     spec:
       containers:
       - name: hermes
-        image: nginx
+        image: rdkr/hermes:test
         ports:
-        - containerPort: 80
+        - name: http
+          containerPort: 8080
+        env:
+
 
 ---
 apiVersion: v1
@@ -28,10 +31,67 @@ metadata:
     app: hermes
 spec:
   ports:
-  - port: 80
-    protocol: TCP
+  - name: http
+    port: 8080
   selector:
-    run: hermes
+    app: hermes
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: testing123-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    # - host: testing123.example.com             # the domain you want associated
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: grafana
+              servicePort: 3000
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: prometheus
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs: ["get"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: hermes
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -39,25 +99,27 @@ kind: Prometheus
 metadata:
   name: prometheus
 spec:
+  serviceAccountName: prometheus
   resources:
     requests:
       memory: 256Mi
   serviceMonitorSelector:
     matchExpressions:
     - {key: app, operator: Exists}
+
 ---
 apiVersion:  monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: hermes
   labels:
-    tier: hermes
+    app: hermes
 spec:
   selector:
     matchLabels:
-      tier: hermes
+      app: hermes
   endpoints:
-  - port: hermes
+  - targetPort: 8080
     interval: 10s
 
 ---
