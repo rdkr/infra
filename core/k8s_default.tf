@@ -12,8 +12,3 @@ resource "helm_release" "ingress" {
     "${file("values-ingress.yaml")}"
   ]
 }
-
-data "helm_repository" "stable" {
-  name = "stable"
-  url  = "https://kubernetes-charts.storage.googleapis.com"
-}
