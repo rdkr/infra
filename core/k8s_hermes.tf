@@ -4,7 +4,11 @@ resource "kubernetes_namespace" "hermes" {
   }
 }
 resource "kubernetes_secret" "hermes" {
+    metadata{
+        name = "hermes"
     namespace = kubernetes_namespace.hermes.name
+
+    }
   data = {
     username = "admin"
 
