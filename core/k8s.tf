@@ -51,12 +51,6 @@ resource "kubernetes_namespace" "hermes" {
   }
 }
 
-resource "kubernetes_namespace" "concourse" {
-  metadata {
-    name = "concourse"
-  }
-}
-
 resource "kubernetes_secret" "hermes" {
   metadata {
     name      = "hermes"
@@ -70,5 +64,6 @@ resource "kubernetes_secret" "hermes" {
     "CSGO_WEB_TOKEN_DM"   = var.CSGO_WEB_TOKEN_DM
     "CSGO_RCON_PASSWORD"  = var.CSGO_RCON_PASSWORD
     "CSGO_SV_PASSWORD"    = var.CSGO_SV_PASSWORD
+    "CSGO_DISCORD_TOKEN"  = var.CSGO_DISCORD_TOKEN
   }
 }

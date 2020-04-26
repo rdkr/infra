@@ -25,3 +25,7 @@ variable "CSGO_RCON_PASSWORD" {
 variable "CSGO_SV_PASSWORD" {
   type = string
 }
+
+variable "CSGO_DISCORD_TOKEN" {
+  type = string
+}
