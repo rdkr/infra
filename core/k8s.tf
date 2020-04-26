@@ -29,6 +29,29 @@ provider "kubernetes" {
   )
 }
 
+resource "kubernetes_namespace" "networking" {
+  metadata {
+    name = "networking"
+  }
+}
+
+resource "kubernetes_secret" "external_dns" {
+  metadata {
+    name      = "external-dns"
+    namespace = kubernetes_namespace.networking.metadata[0].name
+
+  }
+  data = {
+    "digitalocean_api_token" = var.do_token
+  }
+}
+
+resource "kubernetes_namespace" "monitoring" {
+  metadata {
+    name = "monitoring"
+  }
+}
+
 resource "kubernetes_namespace" "hermes" {
   metadata {
     name = "hermes"

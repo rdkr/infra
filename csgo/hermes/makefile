@@ -23,11 +23,16 @@ graf:
 		 grafana/grafana
 
 install:
-	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/bundle.yaml
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com
 	helm upgrade --install \
+		--namespace default \
+		-f ../../core/values-ingress.yaml \
+		ingress stable/nginx-ingress
+	kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/bundle.yaml
+	kubectl apply -f k8s.yaml
+	helm upgrade --install \
 		--set sidecar.datasources.enabled=true \
+		--set sidecar.dashboards.enabled=true \
+		-f values-grafana.yaml \
 		grafana stable/grafana
-	# helm upgrade --install --namespace hermes \
-	# 	-f values-prometheus.yaml \
-	# 	prometheus stable/prometheus
+	kubectl get secret --namespace hermes grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
