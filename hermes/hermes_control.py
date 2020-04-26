@@ -1,13 +1,12 @@
 import asyncio
-from aiohttp import web
-import a2s
 from enum import Enum
 import os
 import socket
+import sys
 
+from aiohttp import web
+import a2s
 import digitalocean
-import discord
-from discord.ext import tasks, commands
 import jinja2
 
 
@@ -15,7 +14,11 @@ def loop(time):
     def timer(f):
         async def looper(*args, **kwargs):
             while True:
-                await f(*args, **kwargs)
+                try:
+                    await f(*args, **kwargs)
+                except Exception as e:
+                    print(e)
+                    sys.exit(1)
                 await asyncio.sleep(time)
 
         return looper

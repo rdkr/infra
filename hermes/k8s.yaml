@@ -17,6 +17,11 @@ spec:
       containers:
       - name: hermes
         image: rdkr/hermes:test
+        imagePullPolicy: Always
+        command:
+          - python
+        args:
+          - hermes_control.py
         ports:
         - name: http
           containerPort: 8080
@@ -86,12 +91,17 @@ spec:
       containers:
       - name: hermes-discord
         image: rdkr/hermes:test
+        imagePullPolicy: Always
+        command:
+          - python
+        args:
+          - hermes_discord.py
         env:
           - name: DISCORD_TOKEN
             valueFrom:
               secretKeyRef:
                 name: hermes
-                key: DISCORD_TOKEN
+                key: CSGO_DISCORD_TOKEN
 # ---
 # apiVersion: extensions/v1beta1
 # kind: Ingress
