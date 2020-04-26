@@ -9,15 +9,8 @@ resource "digitalocean_kubernetes_cluster" "cluster" {
   node_pool {
     name       = "default"
     size       = "s-1vcpu-2gb"
-    node_count = 1
+    node_count = 2
   }
-}
-
-resource "digitalocean_kubernetes_node_pool" "default" {
-  cluster_id = digitalocean_kubernetes_cluster.cluster.id
-  name       = "s-2vcpu-2gb"
-  size       = "s-2vcpu-2gb"
-  node_count = 1
 }
 
 provider "kubernetes" {
