@@ -1,11 +1,8 @@
 ---
-controller:
-  kind: DaemonSet
-  hostNetwork: true
-  dnsPolicy: ClusterFirstWithHostNet
-  daemonset:
-    useHostPort: true
-  service:
-    type: ClusterIP
+provider: digitalocean
+digitalocean:
+  secretName: external-dns
+domainFilters:
+  - k8s.rdkr.uk
 rbac:
   create: true

@@ -1,14 +1,14 @@
 install:
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com
 	helm upgrade --install \
-		--namespace default \
-		-f ../../core/values-nginx-ingress.yaml \
+		--namespace networking \
+		-f values-nginx-ingress.yaml \
 		nginx-ingress stable/nginx-ingress
 	helm upgrade --install \
-		--namespace default \
-		-f ../../core/values-ingress.yaml \
+		--namespace networking \
+		-f values-external-dns.yaml \
 		external-dns stable/external-dns
-	stable/external-dns
+
 	# kubectl apply -f https://raw.githubusercontent.com/coreos/prometheus-operator/v0.38.1/bundle.yaml
 	# kubectl apply -f k8s.yaml
 	# helm upgrade --install \
