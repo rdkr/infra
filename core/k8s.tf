@@ -58,12 +58,25 @@ resource "kubernetes_secret" "hermes" {
 
   }
   data = {
-    "DO_TOKEN" = var.do_token
+    "DO_TOKEN"            = var.do_token
     "CSGO_GSLT_TOKEN_DM"  = var.CSGO_GSLT_TOKEN_DM
     "CSGO_GSLT_TOKEN_PUG" = var.CSGO_GSLT_TOKEN_PUG
     "CSGO_WEB_TOKEN_DM"   = var.CSGO_WEB_TOKEN_DM
     "CSGO_RCON_PASSWORD"  = var.CSGO_RCON_PASSWORD
     "CSGO_SV_PASSWORD"    = var.CSGO_SV_PASSWORD
     "CSGO_DISCORD_TOKEN"  = var.CSGO_DISCORD_TOKEN
+  }
+}
+
+
+resource "digitalocean_firewall" "web" {
+  name = "web"
+
+  tags = ["k8s"]
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = ["0.0.0.0/0", "::/0"]
   }
 }

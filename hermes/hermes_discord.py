@@ -33,10 +33,12 @@ class ServerManager(commands.Cog):
 
     @commands.command()
     async def start(self, ctx, server_name):
+        print(f'starting {server_name}')
         self.session.post(f'http://hermes/start/{server_name}')
 
     @commands.command()
     async def stop(self, ctx, server_name):
+        print(f'stopping {server_name}')
         self.session.post(f'http://hermes/stop/{server_name}')
 
 

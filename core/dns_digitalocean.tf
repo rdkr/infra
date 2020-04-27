@@ -1,5 +1,5 @@
 resource "digitalocean_domain" "dm_rdkr_uk" {
-  name       = "dm.rdkr.uk"
+  name = "dm.rdkr.uk"
 }
 
 resource "cloudflare_record" "dm_rdkr_uk_1" {
@@ -27,7 +27,7 @@ resource "cloudflare_record" "dm_rdkr_uk_3" {
 }
 
 resource "digitalocean_domain" "pug_rdkr_uk" {
-  name       = "pug.rdkr.uk"
+  name = "pug.rdkr.uk"
 }
 
 resource "cloudflare_record" "pug_rdkr_uk_1" {
@@ -47,7 +47,7 @@ resource "cloudflare_record" "pug_rdkr_uk_2" {
 }
 
 resource "digitalocean_domain" "k8s_rdkr_uk" {
-  name       = "k8s.rdkr.uk"
+  name = "k8s.rdkr.uk"
 }
 
 resource "cloudflare_record" "pug_rdkr_uk_3" {
