@@ -26,7 +26,7 @@ kubeApiServer:
 kubelet:
   enabled: true
 kubeControllerManager:
-  enabled: true
+  enabled: false
 coreDns:
   enabled: true
 kubeDns:

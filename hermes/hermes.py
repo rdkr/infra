@@ -228,9 +228,9 @@ class DiscordManager(commands.Cog):
 
     async def start_with_token(self, app):
         print("starting...")
-        await self.bot.login(self.token)
+        asyncio.create_task(self.bot.start(self.token))
         # self.manager_status_loop.start()
-        await self.bot.connect()
+        # await self.bot.connect()
 
 
     @tasks.loop(loop=None)

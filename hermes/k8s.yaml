@@ -21,7 +21,7 @@ spec:
         command:
           - python
         args:
-          - hermes_control.py
+          - hermes.py
         ports:
         - name: http
           containerPort: 8080
@@ -31,6 +31,11 @@ spec:
               secretKeyRef:
                 name: hermes
                 key: DO_TOKEN
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: hermes
+                key: CSGO_DISCORD_TOKEN
           - name: CSGO_GSLT_TOKEN_DM
             valueFrom:
               secretKeyRef:
@@ -68,41 +73,10 @@ metadata:
 spec:
   ports:
   - name: http
-    port: 80
+    port: 8080
     targetPort: http
   selector:
     app: hermes
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: hermes-discord
-  namespace: hermes
-spec:
-  selector:
-    matchLabels:
-      app: hermes-discord
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: hermes-discord
-    spec:
-      containers:
-      - name: hermes-discord
-        image: rdkr/hermes:test
-        imagePullPolicy: Always
-        command:
-          - python
-        args:
-          - hermes_discord.py
-        env:
-          - name: DISCORD_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: hermes
-                key: CSGO_DISCORD_TOKEN
 
 ---
 apiVersion:  monitoring.coreos.com/v1
@@ -116,5 +90,7 @@ spec:
     matchLabels:
       app: hermes
   endpoints:
-  - targetPort: 80
+  - targetPort: http
     interval: 10s
+  namespaceSelector:
+    any: true

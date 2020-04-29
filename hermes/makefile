@@ -13,3 +13,6 @@ run:
 
 install:
 	kubectl apply -f k8s.yaml
+
+uninstall:
+	kubectl delete -f k8s.yaml
