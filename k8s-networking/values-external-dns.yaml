@@ -1,6 +1,6 @@
 ---
 provider: cloudflare
-digitalocean:
+cloudflare:
   secretName: external-dns
 domainFilters:
   - k8s.rdkr.uk
