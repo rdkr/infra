@@ -1,5 +1,5 @@
 ---
-provider: digitalocean
+provider: cloudflare
 digitalocean:
   secretName: external-dns
 domainFilters:

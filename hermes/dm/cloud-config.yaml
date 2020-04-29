@@ -62,6 +62,8 @@ write_files:
       host_info_show 2
       host_players_show 2
 
+      qs_headshot 0
+
       sv_downloadurl "https://neel.rdkr.uk/csgo"
 
 runcmd:

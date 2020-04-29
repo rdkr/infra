@@ -35,7 +35,7 @@ resource "kubernetes_secret" "external_dns" {
 
   }
   data = {
-    "digitalocean_api_token" = var.do_token
+    "cloudflare_api_token" = var.cloudflare_token
   }
 }
 
