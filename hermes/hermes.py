@@ -7,8 +7,12 @@ import sys
 from aiohttp import web
 import a2s
 import digitalocean
+from discord.ext import commands, tasks
 import jinja2
 
+
+ADMIN = 666716587083956224
+HERMES = 701189984132136990
 
 def loop(time):
     def timer(f):
@@ -127,7 +131,7 @@ class Server:
                 change = f"Δ{key}:{old}->{new}"
                 if not (key == "droplet" and old and new and old.id == new.id):
                     self.report(f"{change};")
-                    await self.q.put((self.name, key))
+                    await self.q.put((self.name, key, change))
 
     def get_status(self):
         return dict(
@@ -215,6 +219,63 @@ class ServerManager:
         for server in self.servers.values():
             await server.update_state()
 
+class DiscordManager(commands.Cog):
+    def __init__(self, bot, app, token):
+        self.bot = bot
+        self.app = app
+        self.token = token
+
+
+    async def start_with_token(self, app):
+        print("starting...")
+        await self.bot.login(self.token)
+        # self.manager_status_loop.start()
+        await self.bot.connect()
+
+
+    @tasks.loop(loop=None)
+    async def manager_status_loop(self):
+        while True:
+            name, key, change = await self.app['manager'].q.get()
+
+            # print(name, key, change)#
+            # # for i in self.bot.get_all_channels():
+            # #     print("h", i)
+            # channel = self.bot.get_channel(ADMIN)
+            # if not channel:
+            #     continue
+
+            # if key == "droplet":
+            #     continue
+            # await self.channel.send('fd'
+            #     f"update for **{name}.rdkr.uk**\n`{key}: {change}`"
+            # )
+            # print('snt')
+
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        channel = ADMIN if message.channel.id == ADMIN else HERMES
+        self.channel = self.bot.get_channel(channel)
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, exception):
+        await ctx.send(f"```Command error: {exception}```")
+
+    @commands.command()
+    async def status(self, ctx):
+        for name, server in self.app["manager"].servers.items():
+            status = server.get_status()
+            await ctx.send(f'server status for **{name}.rdkr.uk**```{status}```')
+
+    @commands.command()
+    async def start(self, ctx, server_name):
+        await self.app["manager"].servers[server_name].update(desired=State.ON)
+
+    @commands.command()
+    async def stop(self, ctx, server_name):
+        await self.app["manager"].servers[server_name].update(desired=State.OFF)
+
 
 async def metrics(request):
     msgs = []
@@ -241,8 +302,14 @@ async def stop(request):
 if __name__ == "__main__":
 
     app = web.Application()
+
     app["manager"] = ServerManager()
+    app["dc_bot"] = commands.Bot(command_prefix="!")
+    app["dc_manager"] = DiscordManager(app["dc_bot"], app, os.environ["DISCORD_TOKEN"])
+    app["dc_bot"].add_cog(app["dc_manager"])
     app.on_startup.append(app["manager"].start)
+    app.on_startup.append(app["dc_manager"].start_with_token)
+
     app.add_routes(
         [
             web.get("/metrics", metrics),

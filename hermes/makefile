@@ -9,7 +9,7 @@ run:
 		-e CSGO_WEB_TOKEN_DM=${CSGO_WEB_TOKEN_DM} \
 		-e CSGO_RCON_PASSWORD="${CSGO_RCON_PASSWORD}" \
 		-e CSGO_SV_PASSWORD="${CSGO_SV_PASSWORD}" \
-		discord python hermes_control.py
+		discord python hermes.py
 
 install:
 	kubectl apply -f k8s.yaml

@@ -1,4 +1,5 @@
 grafana:
+  enabled: true
   grafana.ini:
     paths:
       data: /var/lib/grafana/data
@@ -20,3 +21,21 @@ alertmanager:
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false # use all servicemonitors
+kubeApiServer:
+  enabled: true
+kubelet:
+  enabled: true
+kubeControllerManager:
+  enabled: true
+coreDns:
+  enabled: true
+kubeDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+prometheusOperator:
+  createCustomResource: false
