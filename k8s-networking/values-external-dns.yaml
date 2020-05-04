@@ -3,6 +3,6 @@ provider: cloudflare
 cloudflare:
   secretName: external-dns
 domainFilters:
-  - k8s.rdkr.uk
+  - rdkr.uk
 rbac:
   create: true

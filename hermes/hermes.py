@@ -3,6 +3,7 @@ from enum import Enum
 import os
 import socket
 import sys
+import traceback
 
 from aiohttp import web
 import a2s
@@ -14,6 +15,7 @@ import jinja2
 ADMIN = 666716587083956224
 HERMES = 701189984132136990
 
+
 def loop(time):
     def timer(f):
         async def looper(*args, **kwargs):
@@ -21,7 +23,7 @@ def loop(time):
                 try:
                     await f(*args, **kwargs)
                 except Exception as e:
-                    print(e)
+                    traceback.print_exc(file=sys.stdout)
                     sys.exit(1)
                 await asyncio.sleep(time)
 
@@ -49,7 +51,7 @@ class Server:
         self.csgo = False
         self.csgo_info = None
         self.inactive = 0
-        self.max_inactive = 3600
+        self.max_inactive = 720
 
     async def update_csgo(self):
 
@@ -137,7 +139,9 @@ class Server:
         return dict(
             current=self.current.value,
             desired=self.desired.value,
-            csgo_version=int(self.csgo_info.version.replace(".", "")) if self.csgo else -1,
+            csgo_version=int(self.csgo_info.version.replace(".", ""))
+            if self.csgo
+            else -1,
             csgo_player_count=self.csgo_info.player_count if self.csgo else -1,
             csgo_max_players=self.csgo_info.max_players if self.csgo else -1,
             csgo_ping=self.csgo_info.ping if self.csgo else -1,
@@ -219,39 +223,35 @@ class ServerManager:
         for server in self.servers.values():
             await server.update_state()
 
+
 class DiscordManager(commands.Cog):
     def __init__(self, bot, app, token):
         self.bot = bot
         self.app = app
         self.token = token
 
-
     async def start_with_token(self, app):
-        print("starting...")
+        self.manager_status_loop.start()
         asyncio.create_task(self.bot.start(self.token))
-        # self.manager_status_loop.start()
-        # await self.bot.connect()
-
 
     @tasks.loop(loop=None)
     async def manager_status_loop(self):
         while True:
-            name, key, change = await self.app['manager'].q.get()
+            name, key, change = await self.app["manager"].q.get()
 
-            # print(name, key, change)#
-            # # for i in self.bot.get_all_channels():
-            # #     print("h", i)
-            # channel = self.bot.get_channel(ADMIN)
-            # if not channel:
-            #     continue
-
+            print(name, key, change)  #
+            # for i in self.bot.get_all_channels():
+            #     print("h", i)
+            channel = self.bot.get_channel(ADMIN)
+            channel = self.bot.guilds
+            print(channel)
+            if not channel:
+                continue
             # if key == "droplet":
             #     continue
             # await self.channel.send('fd'
             #     f"update for **{name}.rdkr.uk**\n`{key}: {change}`"
             # )
-            # print('snt')
-
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -266,7 +266,7 @@ class DiscordManager(commands.Cog):
     async def status(self, ctx):
         for name, server in self.app["manager"].servers.items():
             status = server.get_status()
-            await ctx.send(f'server status for **{name}.rdkr.uk**```{status}```')
+            await ctx.send(f"server status for **{name}.rdkr.uk**```{status}```")
 
     @commands.command()
     async def start(self, ctx, server_name):
@@ -298,6 +298,7 @@ async def stop(request):
         desired=State.OFF
     )
     return web.Response()
+
 
 if __name__ == "__main__":
 
