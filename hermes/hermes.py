@@ -50,8 +50,8 @@ class Server:
         self.droplet = None
         self.csgo = False
         self.csgo_info = None
-        self.inactive = 0
-        self.max_inactive = 720
+        self.timeout_cur = 0
+        self.timeout_max = 900
 
     async def update_csgo(self):
 
@@ -80,11 +80,11 @@ class Server:
 
         elif self.current in [State.ON] and self.csgo:
             if self.csgo_info.player_count > 0:
-                self.inactive = 0
-            elif self.inactive > self.max_inactive:
+                self.timeout_cur = 0
+            elif self.timeout_cur > self.timeout_max:
                 await self.update(desired=State.OFF)
             else:
-                self.inactive = self.inactive + 1
+                self.timeout_cur = self.timeout_cur + 1
 
         elif self.current in [State.ON] and not self.csgo:
             await self.update(current=State.STARTING)
@@ -137,17 +137,17 @@ class Server:
 
     def get_status(self):
         return dict(
-            current=self.current.value,
-            desired=self.desired.value,
+            csgo_current=self.current.value,
+            csgo_desired=self.desired.value,
             csgo_version=int(self.csgo_info.version.replace(".", ""))
             if self.csgo
-            else -1,
-            csgo_player_count=self.csgo_info.player_count if self.csgo else -1,
-            csgo_max_players=self.csgo_info.max_players if self.csgo else -1,
-            csgo_ping=self.csgo_info.ping if self.csgo else -1,
-            csgo_inactive=self.inactive,
-            csgo_max_inactive=self.max_inactive,
-            droplet=self.droplet.id if self.droplet else -1,
+            else 0,
+            csgo_player_count=self.csgo_info.player_count if self.csgo else 0,
+            csgo_max_players=self.csgo_info.max_players if self.csgo else 0,
+            csgo_ping=self.csgo_info.ping if self.csgo else 0,
+            csgo_timeout_cur=self.timeout_cur,
+            csgo_timeout_max=self.timeout_max,
+            csgo_droplet=self.droplet.id if self.droplet else 0,
         )
 
     def report(self, action):
@@ -225,10 +225,18 @@ class ServerManager:
 
 
 class DiscordManager(commands.Cog):
-    def __init__(self, bot, app, token):
+    def __init__(self, bot, gameserver_manager, token):
         self.bot = bot
-        self.app = app
+        self.channel = None
+        self.gameserver_manager = gameserver_manager
         self.token = token
+
+    async def message(self, message):
+        if not self.channel:
+            if not self.bot.is_ready():
+                return
+            self.channel = self.bot.get_channel(ADMIN)
+        await self.channel.send(message)
 
     async def start_with_token(self, app):
         self.manager_status_loop.start()
@@ -237,21 +245,13 @@ class DiscordManager(commands.Cog):
     @tasks.loop(loop=None)
     async def manager_status_loop(self):
         while True:
-            name, key, change = await self.app["manager"].q.get()
-
-            print(name, key, change)  #
-            # for i in self.bot.get_all_channels():
-            #     print("h", i)
-            channel = self.bot.get_channel(ADMIN)
-            channel = self.bot.guilds
-            print(channel)
-            if not channel:
-                continue
-            # if key == "droplet":
-            #     continue
-            # await self.channel.send('fd'
-            #     f"update for **{name}.rdkr.uk**\n`{key}: {change}`"
-            # )
+            try:
+                name, key, change = await self.gameserver_manager.q.get()
+                if key == "droplet":
+                    continue
+                await self.message(f"update for **{name}.rdkr.uk**\n`{change}`")
+            except Exception as e:
+                print(e)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -264,21 +264,30 @@ class DiscordManager(commands.Cog):
 
     @commands.command()
     async def status(self, ctx):
-        for name, server in self.app["manager"].servers.items():
+        for name, server in self.gameserver_manager.servers.items():
             status = server.get_status()
-            await ctx.send(f"server status for **{name}.rdkr.uk**```{status}```")
+            pretty_status = ""
+            for key, value in status.items():
+                key = key.replace('csgo_', '')
+                if key in ['current', 'desired']:
+                    value = State(value)
+                if value == 0:
+                    continue
+                line = f"{key.ljust(14)} {value}\n"
+                pretty_status = pretty_status + line
+            await ctx.send(f"server status for **{name}.rdkr.uk**\n```{pretty_status}```")
 
     @commands.command()
     async def start(self, ctx, server_name):
-        await self.app["manager"].servers[server_name].update(desired=State.ON)
+        await self.gameserver_manager.servers[server_name].update(desired=State.ON)
 
     @commands.command()
     async def stop(self, ctx, server_name):
-        await self.app["manager"].servers[server_name].update(desired=State.OFF)
+        await self.gameserver_manager.servers[server_name].update(desired=State.OFF)
 
 
 async def metrics(request):
-    msgs = []
+    msgs = ['csgo_hermes_alive 1']
     for server in request.app["manager"].servers.values():
         status = server.get_status()
         for k, v in status.items():
@@ -304,12 +313,15 @@ if __name__ == "__main__":
 
     app = web.Application()
 
-    app["manager"] = ServerManager()
-    app["dc_bot"] = commands.Bot(command_prefix="!")
-    app["dc_manager"] = DiscordManager(app["dc_bot"], app, os.environ["DISCORD_TOKEN"])
-    app["dc_bot"].add_cog(app["dc_manager"])
-    app.on_startup.append(app["manager"].start)
-    app.on_startup.append(app["dc_manager"].start_with_token)
+    gameserver_manager = ServerManager()
+    discord_bot = commands.Bot(command_prefix="!")
+    discord_manager = DiscordManager(
+        discord_bot, gameserver_manager, os.environ["DISCORD_TOKEN"]
+    )
+    discord_bot.add_cog(discord_manager)
+
+    app.on_startup.append(gameserver_manager.start)
+    app.on_startup.append(discord_manager.start_with_token)
 
     app.add_routes(
         [
