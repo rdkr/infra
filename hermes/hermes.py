@@ -265,16 +265,15 @@ class DiscordManager(commands.Cog):
     async def status(self, ctx):
         for name, server in self.gameserver_manager.servers.items():
             status = server.get_status()
-            pretty_status = ""
-            for key, value in status.items():
-                key = key.replace('csgo_', '')
-                if key in ['current', 'desired']:
-                    value = State(value)
-                if value == 0:
-                    continue
-                line = f"{key.ljust(14)} {value}\n"
-                pretty_status = pretty_status + line
-            await ctx.send(f"server status for **{name}.rdkr.uk**\n```{pretty_status}```")
+            pretty_status = []
+            pretty_status.append(f"current {State(status['csgo_current'])}")
+            pretty_status.append(f"desired {State(status['csgo_desired'])}")
+            if status['csgo_ping'] != 0:
+                pretty_status.append(f"version {status['csgo_version']}")
+                pretty_status.append(f"players {status['csgo_max_players']}/{status['csgo_max_players']}")
+                pretty_status.append(f"timeout {status['csgo_timeout_cur']}/{status['csgo_timeout_cur']}")
+            msg = '\n'.join(pretty_status)
+            await ctx.send(f"server status for **{name}.rdkr.uk**\n```{msg}```")
 
     @commands.command()
     async def start(self, ctx, server_name):
