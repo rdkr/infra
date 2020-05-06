@@ -270,8 +270,8 @@ class DiscordManager(commands.Cog):
             pretty_status.append(f"desired {State(status['csgo_desired'])}")
             if status['csgo_ping'] != 0:
                 pretty_status.append(f"version {status['csgo_version']}")
-                pretty_status.append(f"players {status['csgo_max_players']}/{status['csgo_max_players']}")
-                pretty_status.append(f"timeout {status['csgo_timeout_cur']}/{status['csgo_timeout_cur']}")
+                pretty_status.append(f"players {status['csgo_player_count']}/{status['csgo_max_players']}")
+                pretty_status.append(f"timeout {status['csgo_timeout_cur']}/{status['csgo_timeout_max']}")
             msg = '\n'.join(pretty_status)
             await ctx.send(f"server status for **{name}.rdkr.uk**\n```{msg}```")
 
