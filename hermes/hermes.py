@@ -35,10 +35,9 @@ def loop(time):
 class State(Enum):
     UNKNOWN = 0
     OFF = 1
-    ON = 2
-    STARTING = 3
-    STOPPING = 4
-
+    STARTING = 2
+    STOPPING = 3
+    ON = 4
 
 class Server:
     def __init__(self, name, q):
