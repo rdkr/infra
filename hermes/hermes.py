@@ -323,6 +323,8 @@ if __name__ == "__main__":
     app.on_startup.append(gameserver_manager.start)
     app.on_startup.append(discord_manager.start_with_token)
 
+    app["manager"] = gameserver_manager
+
     app.add_routes(
         [
             web.get("/metrics", metrics),

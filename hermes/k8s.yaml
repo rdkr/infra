@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: hermes
-        image: rdkr/hermes:test
+        image: rdkr/hermes:latest
         imagePullPolicy: Always
         command:
           - python
