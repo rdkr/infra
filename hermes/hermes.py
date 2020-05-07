@@ -53,10 +53,12 @@ class Server:
         self.timeout_max = 900
 
     async def update_csgo(self):
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
-        csgo_conn = sock.connect_ex((f"{self.name}.rdkr.uk", 27015)) == 0
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            csgo_conn = sock.connect_ex((f"{self.name}.rdkr.uk", 27015)) == 0
+        except socket.timeout:
+            csgo_conn = False
         if csgo_conn:
             self.csgo_info = a2s.info((f"{self.name}.rdkr.uk", 27015))
         return await self.update(csgo=csgo_conn)
