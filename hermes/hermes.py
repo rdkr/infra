@@ -105,7 +105,7 @@ class Server:
             token=os.environ["DO_TOKEN"],
             name=f"csgo-{self.name}",
             region="lon1",
-            image="62537048",
+            image="63267584",
             size_slug="s-1vcpu-2gb",
             ssh_keys=[
                 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGs5SOHcst8xy0Te3LR3/0fGIIYaTc3yLnts1ZZQLuvn neel@Neels-MBP"
