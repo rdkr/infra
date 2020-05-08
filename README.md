@@ -8,18 +8,22 @@
 
 ## csgo
 
-* packer
-    * csgo base server on digitalocean
-    
-```
-wget -nc -O quake.zip https://forums.alliedmods.net/attachment.php?attachmentid=125461&d=1380903530
-unzip quake.zip
-aws s3 sync FastDL/sound/quake/standard s3://neel.rdkr.uk/csgo/sound/quake/standard
-rm -r GameServer FastDL quake quake.zip
-```
+* base
+    * packer to build LGSM csgo base server on digitalocean
+* other files with config for servers built on top of base
 
+## hermes
 
-== digital ocean
-no where to store secrets
+12 factor app (work in progress) to manage csgo servers
 
-== 
+### v1
+* start / stop csgo servers on digital oceaan
+
+### v2
+* added control over discord commands
+
+### v3
+* added deployment to k8s with prometheus metrics exposed
+
+### v4 (todo)
+* make stateless / scaleable

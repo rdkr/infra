@@ -249,7 +249,7 @@ class DiscordManager(commands.Cog):
         while True:
             try:
                 name, key, change = await self.gameserver_manager.q.get()
-                if key == "droplet":
+                if key in ["droplet", "csgo"]:
                     continue
                 await self.message(f"update for **{name}.rdkr.uk**\n`{change}`")
             except Exception as e:
