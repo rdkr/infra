@@ -14,7 +14,7 @@ import jinja2
 
 ADMIN = 666716587083956224
 HERMES = 701189984132136990
-
+ERRORS = 0 # todo - sort this
 
 def loop(time):
     def timer(f):
@@ -24,7 +24,8 @@ def loop(time):
                     await f(*args, **kwargs)
                 except Exception as e:
                     traceback.print_exc(file=sys.stdout)
-                    sys.exit(1)
+                    global ERRORS
+                    ERRORS = ERRORS + 1
                 await asyncio.sleep(time)
 
         return looper
@@ -288,6 +289,8 @@ class DiscordManager(commands.Cog):
 
 async def metrics(request):
     msgs = ['csgo_hermes_alive 1']
+    global ERRORS
+    msgs.append(f'csgo_hermes_errors {ERRORS}')
     for server in request.app["manager"].servers.values():
         status = server.get_status()
         for k, v in status.items():
