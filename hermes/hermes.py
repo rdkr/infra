@@ -1,5 +1,6 @@
 import asyncio
 from enum import Enum
+import logging
 import os
 import socket
 import sys
@@ -12,9 +13,12 @@ from discord.ext import commands, tasks
 import jinja2
 
 
+logging.basicConfig(level=logging.INFO)
+
 ADMIN = 666716587083956224
 HERMES = 701189984132136990
-ERRORS = 0 # todo - sort this
+ERRORS = 0  # todo - sort this
+
 
 def loop(time):
     def timer(f):
@@ -39,6 +43,7 @@ class State(Enum):
     STARTING = 2
     STOPPING = 3
     ON = 4
+
 
 class Server:
     def __init__(self, name, q):
@@ -153,7 +158,7 @@ class Server:
         )
 
     def report(self, action):
-        print(f"{list(self.get_status().values())}; {action}")
+        logging.info(f"{list(self.get_status().values())}; {action}")
 
 
 class ServerManager:
@@ -179,7 +184,7 @@ class ServerManager:
         csgo_list = [d for d in droplets_list if d.name.startswith("csgo")]
 
         if len(csgo_list) > 2:
-            print(f"emergency stopping {len(droplets_list)} droplets")
+            logging.warning(f"emergency stopping {len(droplets_list)} droplets")
             for d in csgo_list:
                 d.destroy()
 
@@ -205,14 +210,14 @@ class ServerManager:
                     if r.data == server.droplet.ip_address:
                         correct = True
                     else:
-                        print(f"dns {name} destroy: {r}")
+                        logging.info(f"dns {name} destroy: {r}")
                         r.destroy()
 
             if not correct:
                 record = dict(
                     type="A", name="@", ttl=60, data=server.droplet.ip_address
                 )
-                print(f"dns {name} create: {record}")
+                logging.info(f"dns {name} create: {record}")
                 domain.create_new_domain_record(**record)
 
     @loop(10)
@@ -253,7 +258,7 @@ class DiscordManager(commands.Cog):
                     continue
                 await self.message(f"update for **{name}.rdkr.uk**\n`{change}`")
             except Exception as e:
-                print(e)
+                logging.error(e)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -271,11 +276,15 @@ class DiscordManager(commands.Cog):
             pretty_status = []
             pretty_status.append(f"current {State(status['csgo_current'])}")
             pretty_status.append(f"desired {State(status['csgo_desired'])}")
-            if status['csgo_ping'] != 0:
+            if status["csgo_ping"] != 0:
                 pretty_status.append(f"version {status['csgo_version']}")
-                pretty_status.append(f"players {status['csgo_player_count']}/{status['csgo_max_players']}")
-                pretty_status.append(f"timeout {status['csgo_timeout_cur']}/{status['csgo_timeout_max']}")
-            msg = '\n'.join(pretty_status)
+                pretty_status.append(
+                    f"players {status['csgo_player_count']}/{status['csgo_max_players']}"
+                )
+                pretty_status.append(
+                    f"timeout {status['csgo_timeout_cur']}/{status['csgo_timeout_max']}"
+                )
+            msg = "\n".join(pretty_status)
             await ctx.send(f"server status for **{name}.rdkr.uk**\n```{msg}```")
 
     @commands.command()
@@ -288,9 +297,9 @@ class DiscordManager(commands.Cog):
 
 
 async def metrics(request):
-    msgs = ['csgo_hermes_alive 1']
+    msgs = ["csgo_hermes_alive 1"]
     global ERRORS
-    msgs.append(f'csgo_hermes_errors {ERRORS}')
+    msgs.append(f"csgo_hermes_errors {ERRORS}")
     for server in request.app["manager"].servers.values():
         status = server.get_status()
         for k, v in status.items():
