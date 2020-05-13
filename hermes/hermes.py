@@ -89,6 +89,7 @@ class Server:
             if self.csgo_info.player_count > 0:
                 self.timeout_cur = 0
             elif self.timeout_cur > self.timeout_max:
+                self.timeout_cur = 0
                 await self.update(desired=State.OFF)
             else:
                 self.timeout_cur = self.timeout_cur + 1

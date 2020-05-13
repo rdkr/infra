@@ -16,6 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 23,
+  "iteration": 1589383863847,
   "links": [
     {
       "asDropdown": false,
@@ -24,128 +25,338 @@
       "title": "csgo server details, binds, etc",
       "type": "link",
       "url": "https://neel.rdkr.uk/csgo/"
+    },
+    {
+      "icon": "external link",
+      "tags": [],
+      "targetBlank": false,
+      "title": "source code",
+      "type": "link",
+      "url": "https://github.com/rdkr/infra/"
     }
   ],
   "panels": [
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorPostfix": false,
-      "colorPrefix": false,
-      "colorValue": true,
-      "colors": [
-        "#d44a3a",
-        "rgba(237, 129, 40, 0.89)",
-        "#73BF69"
-      ],
+      "collapsed": false,
       "datasource": null,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
       "gridPos": {
-        "h": 5,
-        "w": 4,
+        "h": 1,
+        "w": 24,
         "x": 0,
         "y": 0
       },
-      "id": 17,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
+      "id": 34,
+      "panels": [],
+      "repeat": "server",
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "dm",
+          "value": "dm"
         }
-      ],
-      "maxDataPoints": 100,
-      "maxPerRow": 2,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "pluginVersion": "6.7.3",
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "70%",
-      "rangeMaps": [
-        {
-          "from": "-2",
-          "text": "n/a",
-          "to": "0"
-        }
-      ],
-      "repeatDirection": "v",
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false,
-        "ymax": null,
-        "ymin": null
       },
-      "tableColumn": "",
+      "title": "$server.rdkr.uk",
+      "type": "row"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": null,
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 24,
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "decimals": 0,
+            "mappings": [
+              {
+                "id": 0,
+                "op": "=",
+                "text": "Unknown",
+                "type": 1,
+                "value": "0"
+              },
+              {
+                "id": 1,
+                "op": "=",
+                "text": "Starting",
+                "type": 1,
+                "value": "2"
+              },
+              {
+                "id": 2,
+                "op": "=",
+                "text": "Stopping",
+                "type": 1,
+                "value": "3"
+              },
+              {
+                "id": 3,
+                "op": "=",
+                "text": "On",
+                "type": 1,
+                "value": "4"
+              },
+              {
+                "id": 4,
+                "op": "=",
+                "text": "Off",
+                "type": 1,
+                "value": "1"
+              }
+            ],
+            "max": 4,
+            "min": 0,
+            "nullValueMode": "connected",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 2
+                },
+                {
+                  "color": "green",
+                  "value": 4
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": [],
+          "values": false
+        },
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal"
+      },
+      "pluginVersion": "6.7.1",
+      "repeatDirection": "v",
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "dm",
+          "value": "dm"
+        }
+      },
       "targets": [
         {
-          "expr": "avg(csgo_current{name=\"pug\"})",
+          "expr": "sum(csgo_current{name=\"$server\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "thresholds": "2,2",
       "timeFrom": null,
       "timeShift": null,
-      "title": "pug current state",
-      "type": "singlestat",
-      "valueFontSize": "100%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "Unknown",
-          "value": "0"
+      "title": "$server current state",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": null,
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "id": 25,
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "decimals": 0,
+            "mappings": [
+              {
+                "id": 0,
+                "op": "=",
+                "text": "Unknown",
+                "type": 1,
+                "value": "0"
+              },
+              {
+                "id": 1,
+                "op": "=",
+                "text": "Off",
+                "type": 1,
+                "value": "1"
+              },
+              {
+                "id": 2,
+                "op": "=",
+                "text": "On",
+                "type": 1,
+                "value": "4"
+              },
+              {
+                "id": 3,
+                "op": "=",
+                "text": "Starting",
+                "type": 1,
+                "value": "2"
+              },
+              {
+                "id": 4,
+                "op": "=",
+                "text": "Stopping",
+                "type": 1,
+                "value": "3"
+              }
+            ],
+            "max": 4,
+            "min": 0,
+            "nullValueMode": "connected",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 2
+                },
+                {
+                  "color": "green",
+                  "value": 4
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": [],
+          "values": false
         },
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal"
+      },
+      "pluginVersion": "6.7.1",
+      "repeatDirection": "v",
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "dm",
+          "value": "dm"
+        }
+      },
+      "targets": [
         {
-          "op": "=",
-          "text": "Off",
-          "value": "1"
-        },
-        {
-          "op": "=",
-          "text": "On",
-          "value": "2"
-        },
-        {
-          "op": "=",
-          "text": "Starting",
-          "value": "3"
-        },
-        {
-          "op": "=",
-          "text": "Stopping",
-          "value": "4"
+          "expr": "sum(csgo_desired{name=\"$server\"})",
+          "interval": "",
+          "legendFormat": "{{name}}",
+          "refId": "A"
         }
       ],
-      "valueName": "current"
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$server desired state",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "id": 50,
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "decimals": 2,
+            "mappings": [
+              {
+                "from": "225",
+                "id": 1,
+                "operator": "",
+                "text": "n/a",
+                "to": "9000",
+                "type": 2,
+                "value": "900"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 5
+                },
+                {
+                  "color": "green",
+                  "value": 15
+                }
+              ]
+            },
+            "unit": "m"
+          },
+          "overrides": [],
+          "values": false
+        },
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
+      "pluginVersion": "6.7.1",
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "dm",
+          "value": "dm"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(csgo_timeout_max{name=\"$server\"}-csgo_timeout_cur{name=\"$server\"})/4",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$server shutdown in",
+      "type": "stat"
     },
     {
       "cacheTimeout": null,
       "colorBackground": false,
       "colorPostfix": false,
       "colorPrefix": false,
-      "colorValue": true,
+      "colorValue": false,
       "colors": [
-        "#d44a3a",
+        "#299c46",
         "rgba(237, 129, 40, 0.89)",
-        "#299c46"
+        "#d44a3a"
       ],
       "datasource": null,
       "format": "none",
@@ -157,12 +368,12 @@
         "thresholdMarkers": true
       },
       "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 4,
-        "y": 0
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
       },
-      "id": 24,
+      "id": 21,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -193,6 +404,13 @@
         }
       ],
       "repeatDirection": "v",
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "dm",
+          "value": "dm"
+        }
+      },
       "sparkline": {
         "fillColor": "rgba(31, 118, 189, 0.18)",
         "full": false,
@@ -204,46 +422,461 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "avg(csgo_current{name=\"dm\"})",
+          "expr": "avg(csgo_version{name=\"$server\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
         }
       ],
-      "thresholds": "2,2",
+      "thresholds": "",
       "timeFrom": null,
       "timeShift": null,
-      "title": "dm current state",
+      "title": "$server game version",
       "type": "singlestat",
       "valueFontSize": "100%",
       "valueMaps": [
         {
           "op": "=",
-          "text": "Unknown",
+          "text": "n/a",
           "value": "0"
-        },
-        {
-          "op": "=",
-          "text": "Off",
-          "value": "1"
-        },
-        {
-          "op": "=",
-          "text": "On",
-          "value": "2"
-        },
-        {
-          "op": "=",
-          "text": "Starting",
-          "value": "3"
-        },
-        {
-          "op": "=",
-          "text": "Stopping",
-          "value": "4"
         }
       ],
       "valueName": "current"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 51,
+      "panels": [],
+      "repeat": null,
+      "repeatIteration": 1589383863847,
+      "repeatPanelId": 34,
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "pug",
+          "value": "pug"
+        }
+      },
+      "title": "$server.rdkr.uk",
+      "type": "row"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": null,
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 6
+      },
+      "id": 52,
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "decimals": 0,
+            "mappings": [
+              {
+                "id": 0,
+                "op": "=",
+                "text": "Unknown",
+                "type": 1,
+                "value": "0"
+              },
+              {
+                "id": 1,
+                "op": "=",
+                "text": "Starting",
+                "type": 1,
+                "value": "2"
+              },
+              {
+                "id": 2,
+                "op": "=",
+                "text": "Stopping",
+                "type": 1,
+                "value": "3"
+              },
+              {
+                "id": 3,
+                "op": "=",
+                "text": "On",
+                "type": 1,
+                "value": "4"
+              },
+              {
+                "id": 4,
+                "op": "=",
+                "text": "Off",
+                "type": 1,
+                "value": "1"
+              }
+            ],
+            "max": 4,
+            "min": 0,
+            "nullValueMode": "connected",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 2
+                },
+                {
+                  "color": "green",
+                  "value": 4
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": [],
+          "values": false
+        },
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal"
+      },
+      "pluginVersion": "6.7.1",
+      "repeatDirection": "v",
+      "repeatIteration": 1589383863847,
+      "repeatPanelId": 24,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "pug",
+          "value": "pug"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(csgo_current{name=\"$server\"})",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$server current state",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "datasource": null,
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 6
+      },
+      "id": 53,
+      "links": [],
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "decimals": 0,
+            "mappings": [
+              {
+                "id": 0,
+                "op": "=",
+                "text": "Unknown",
+                "type": 1,
+                "value": "0"
+              },
+              {
+                "id": 1,
+                "op": "=",
+                "text": "Off",
+                "type": 1,
+                "value": "1"
+              },
+              {
+                "id": 2,
+                "op": "=",
+                "text": "On",
+                "type": 1,
+                "value": "4"
+              },
+              {
+                "id": 3,
+                "op": "=",
+                "text": "Starting",
+                "type": 1,
+                "value": "2"
+              },
+              {
+                "id": 4,
+                "op": "=",
+                "text": "Stopping",
+                "type": 1,
+                "value": "3"
+              }
+            ],
+            "max": 4,
+            "min": 0,
+            "nullValueMode": "connected",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 2
+                },
+                {
+                  "color": "green",
+                  "value": 4
+                }
+              ]
+            },
+            "unit": "none"
+          },
+          "overrides": [],
+          "values": false
+        },
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal"
+      },
+      "pluginVersion": "6.7.1",
+      "repeatDirection": "v",
+      "repeatIteration": 1589383863847,
+      "repeatPanelId": 25,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "pug",
+          "value": "pug"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(csgo_desired{name=\"$server\"})",
+          "interval": "",
+          "legendFormat": "{{name}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$server desired state",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 6
+      },
+      "id": 54,
+      "options": {
+        "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "decimals": 2,
+            "mappings": [
+              {
+                "from": "225",
+                "id": 1,
+                "operator": "",
+                "text": "n/a",
+                "to": "9000",
+                "type": 2,
+                "value": "900"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 5
+                },
+                {
+                  "color": "green",
+                  "value": 15
+                }
+              ]
+            },
+            "unit": "m"
+          },
+          "overrides": [],
+          "values": false
+        },
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
+      "pluginVersion": "6.7.1",
+      "repeatIteration": 1589383863847,
+      "repeatPanelId": 50,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "pug",
+          "value": "pug"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(csgo_timeout_max{name=\"$server\"}-csgo_timeout_cur{name=\"$server\"})/4",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$server shutdown in",
+      "type": "stat"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorPostfix": false,
+      "colorPrefix": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": null,
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 6
+      },
+      "id": 55,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "maxPerRow": 2,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "pluginVersion": "6.7.3",
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "70%",
+      "rangeMaps": [
+        {
+          "from": "-2",
+          "text": "n/a",
+          "to": "0"
+        }
+      ],
+      "repeatDirection": "v",
+      "repeatIteration": 1589383863847,
+      "repeatPanelId": 21,
+      "repeatedByRow": true,
+      "scopedVars": {
+        "server": {
+          "selected": false,
+          "text": "pug",
+          "value": "pug"
+        }
+      },
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false,
+        "ymax": null,
+        "ymin": null
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "avg(csgo_version{name=\"$server\"})",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "$server game version",
+      "type": "singlestat",
+      "valueFontSize": "100%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "n/a",
+          "value": "0"
+        }
+      ],
+      "valueName": "current"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 36,
+      "panels": [],
+      "title": "graphs",
+      "type": "row"
     },
     {
       "aliasColors": {},
@@ -254,10 +887,280 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 11,
-        "w": 16,
+        "h": 8,
+        "w": 4,
+        "x": 0,
+        "y": 11
+      },
+      "hiddenSeries": false,
+      "id": 27,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "6.7.1",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "csgo_hermes_alive",
+          "interval": "",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "hermes uptime",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": "1",
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 4,
+        "y": 11
+      },
+      "hiddenSeries": false,
+      "id": 42,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "6.7.1",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "rate(csgo_hermes_errors[$__interval])",
+          "interval": "",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "hermes errors",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 4,
         "x": 8,
-        "y": 0
+        "y": 11
+      },
+      "hiddenSeries": false,
+      "id": 48,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "6.7.1",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "rate(kube_pod_container_status_restarts_total{namespace=\"hermes\"}[1m])",
+          "interval": "",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "hermes restarts",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 11
       },
       "hiddenSeries": false,
       "id": 16,
@@ -346,402 +1249,6 @@
       }
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorPostfix": false,
-      "colorPrefix": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": null,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 0,
-        "y": 5
-      },
-      "id": 23,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "maxPerRow": 2,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "pluginVersion": "6.7.3",
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "70%",
-      "rangeMaps": [
-        {
-          "from": "-2",
-          "text": "n/a",
-          "to": "0"
-        }
-      ],
-      "repeatDirection": "v",
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false,
-        "ymax": null,
-        "ymin": null
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "avg(csgo_desired{name=\"pug\"})",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": "",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "pug desired state",
-      "type": "singlestat",
-      "valueFontSize": "100%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "Unknown",
-          "value": "0"
-        },
-        {
-          "op": "=",
-          "text": "Off",
-          "value": "1"
-        },
-        {
-          "op": "=",
-          "text": "On",
-          "value": "2"
-        },
-        {
-          "op": "=",
-          "text": "Starting",
-          "value": "3"
-        },
-        {
-          "op": "=",
-          "text": "Stopping",
-          "value": "4"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorPostfix": false,
-      "colorPrefix": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": null,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 4,
-        "y": 5
-      },
-      "id": 25,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "maxPerRow": 2,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "pluginVersion": "6.7.3",
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "70%",
-      "rangeMaps": [
-        {
-          "from": "-2",
-          "text": "n/a",
-          "to": "0"
-        }
-      ],
-      "repeatDirection": "v",
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false,
-        "ymax": null,
-        "ymin": null
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "avg(csgo_desired{name=\"dm\"})",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": "",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "dm desired state",
-      "type": "singlestat",
-      "valueFontSize": "100%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "Unknown",
-          "value": "0"
-        },
-        {
-          "op": "=",
-          "text": "Off",
-          "value": "1"
-        },
-        {
-          "op": "=",
-          "text": "On",
-          "value": "2"
-        },
-        {
-          "op": "=",
-          "text": "Starting",
-          "value": "3"
-        },
-        {
-          "op": "=",
-          "text": "Stopping",
-          "value": "4"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorPostfix": false,
-      "colorPrefix": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": null,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 0,
-        "y": 10
-      },
-      "id": 22,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "maxPerRow": 2,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "pluginVersion": "6.7.3",
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "70%",
-      "rangeMaps": [
-        {
-          "from": "-2",
-          "text": "n/a",
-          "to": "0"
-        }
-      ],
-      "repeatDirection": "v",
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false,
-        "ymax": null,
-        "ymin": null
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "avg(csgo_version{name=\"pug\"})",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": "",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "pug game version",
-      "type": "singlestat",
-      "valueFontSize": "100%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "n/a",
-          "value": "0"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorPostfix": false,
-      "colorPrefix": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": null,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 4,
-        "y": 10
-      },
-      "id": 21,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "maxPerRow": 2,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "pluginVersion": "6.7.3",
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "70%",
-      "rangeMaps": [
-        {
-          "from": "-2",
-          "text": "n/a",
-          "to": "0"
-        }
-      ],
-      "repeatDirection": "v",
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false,
-        "ymax": null,
-        "ymin": null
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "avg(csgo_version{name=\"dm\"})",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": "",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "dm game version",
-      "type": "singlestat",
-      "valueFontSize": "100%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "n/a",
-          "value": "0"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -750,9 +1257,9 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 10,
-        "w": 16,
-        "x": 8,
+        "h": 8,
+        "w": 6,
+        "x": 18,
         "y": 11
       },
       "hiddenSeries": false,
@@ -831,107 +1338,52 @@
         "align": false,
         "alignLevel": null
       }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 0,
-        "y": 15
-      },
-      "hiddenSeries": false,
-      "id": 27,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pluginVersion": "6.7.1",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "csgo_hermes_alive",
-          "interval": "",
-          "legendFormat": "{{pod}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "hermes uptime",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "decimals": 0,
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": "1",
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
     }
   ],
+  "refresh": false,
   "schemaVersion": 22,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": "",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": false,
+        "name": "server",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          },
+          {
+            "selected": false,
+            "text": "dm",
+            "value": "dm"
+          },
+          {
+            "selected": false,
+            "text": "pug",
+            "value": "pug"
+          }
+        ],
+        "query": "dm,pug",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
   },
   "time": {
-    "from": "now-15m",
-    "to": "now"
+    "from": "2020-05-13T15:22:55.551Z",
+    "to": "2020-05-13T15:31:19.048Z"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -953,5 +1405,5 @@
   "variables": {
     "list": []
   },
-  "version": 14
+  "version": 30
 }
