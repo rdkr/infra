@@ -113,12 +113,11 @@ class Server:
                     await self.q.put((self.name, key, change))
 
     def get_status(self):
+        csgo = int(self.csgo_info.version.replace(".", "")) if self.csgo else 0
         return dict(
             csgo_current=self.current.value,
             csgo_desired=self.desired.value,
-            csgo_version=int(self.csgo_info.version.replace(".", ""))
-            if self.csgo
-            else 0,
+            csgo_version=csgo,
             csgo_player_count=self.csgo_info.player_count if self.csgo else 0,
             csgo_max_players=self.csgo_info.max_players if self.csgo else 0,
             csgo_ping=self.csgo_info.ping if self.csgo else 0,
