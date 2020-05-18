@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 23,
-  "iteration": 1589383863847,
+  "iteration": 1589385904097,
   "links": [
     {
       "asDropdown": false,
@@ -285,7 +285,7 @@
         "colorMode": "value",
         "fieldOptions": {
           "calcs": [
-            "mean"
+            "last"
           ],
           "defaults": {
             "decimals": 2,
@@ -336,7 +336,7 @@
       },
       "targets": [
         {
-          "expr": "sum(csgo_timeout_max{name=\"$server\"}-csgo_timeout_cur{name=\"$server\"})/4",
+          "expr": "max(csgo_timeout_max{name=\"$server\"})/4-max(csgo_timeout_cur{name=\"$server\"})/4",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -455,7 +455,7 @@
       "id": 51,
       "panels": [],
       "repeat": null,
-      "repeatIteration": 1589383863847,
+      "repeatIteration": 1589385904097,
       "repeatPanelId": 34,
       "scopedVars": {
         "server": {
@@ -554,7 +554,7 @@
       },
       "pluginVersion": "6.7.1",
       "repeatDirection": "v",
-      "repeatIteration": 1589383863847,
+      "repeatIteration": 1589385904097,
       "repeatPanelId": 24,
       "repeatedByRow": true,
       "scopedVars": {
@@ -664,7 +664,7 @@
       },
       "pluginVersion": "6.7.1",
       "repeatDirection": "v",
-      "repeatIteration": 1589383863847,
+      "repeatIteration": 1589385904097,
       "repeatPanelId": 25,
       "repeatedByRow": true,
       "scopedVars": {
@@ -700,7 +700,7 @@
         "colorMode": "value",
         "fieldOptions": {
           "calcs": [
-            "mean"
+            "last"
           ],
           "defaults": {
             "decimals": 2,
@@ -742,7 +742,7 @@
         "orientation": "auto"
       },
       "pluginVersion": "6.7.1",
-      "repeatIteration": 1589383863847,
+      "repeatIteration": 1589385904097,
       "repeatPanelId": 50,
       "repeatedByRow": true,
       "scopedVars": {
@@ -754,7 +754,7 @@
       },
       "targets": [
         {
-          "expr": "sum(csgo_timeout_max{name=\"$server\"}-csgo_timeout_cur{name=\"$server\"})/4",
+          "expr": "max(csgo_timeout_max{name=\"$server\"})/4-max(csgo_timeout_cur{name=\"$server\"})/4",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -822,7 +822,7 @@
         }
       ],
       "repeatDirection": "v",
-      "repeatIteration": 1589383863847,
+      "repeatIteration": 1589385904097,
       "repeatPanelId": 21,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1010,7 +1010,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(csgo_hermes_errors[$__interval])",
+          "expr": "rate(csgo_hermes_errors[1m])",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -1340,7 +1340,7 @@
       }
     }
   ],
-  "refresh": false,
+  "refresh": "5s",
   "schemaVersion": 22,
   "style": "dark",
   "tags": [],
@@ -1382,8 +1382,8 @@
     ]
   },
   "time": {
-    "from": "2020-05-13T15:22:55.551Z",
-    "to": "2020-05-13T15:31:19.048Z"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -1405,5 +1405,5 @@
   "variables": {
     "list": []
   },
-  "version": 30
+  "version": 31
 }
