@@ -45,8 +45,6 @@ class Server:
         if self.current == State.UNKNOWN:
             if self.droplet and self.csgo:
                 await self.update(current=State.ON)
-            elif self.droplet and not self.csgo:
-                await self.update(current=State.STARTING)
             else:
                 await self.update(current=State.OFF)
 

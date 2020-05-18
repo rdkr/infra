@@ -1,0 +1,23 @@
+digraph G {
+
+    rankdir = "LR"
+
+    unknown  [color=gray]
+    off      [color=red]
+    starting [color=yellow]
+    stopping [color=yellow]
+    on       [color=green]
+
+    unknown -> on
+    unknown -> off
+
+    off -> on
+    off -> starting
+
+    starting -> on
+    stopping -> off
+
+    on -> stopping
+    on -> off
+
+}

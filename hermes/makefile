@@ -21,3 +21,6 @@ install:
 
 uninstall:
 	kubectl delete -f k8s.yaml
+
+flow.png: flow.dot
+	dot -Tpng flow.dot -o flow.png -Gdpi=300
