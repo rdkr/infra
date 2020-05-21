@@ -4,20 +4,19 @@ digraph G {
 
     unknown  [color=gray]
     off      [color=red]
-    starting [color=yellow]
-    stopping [color=yellow]
+    starting [color=orange]
+    stopping [color=orange]
     on       [color=green]
 
     unknown -> on
     unknown -> off
 
-    off -> on
-    off -> starting
+    off -> starting [color=blue]
 
     starting -> on
     stopping -> off
 
-    on -> stopping
+    on -> stopping [color=blue]
     on -> off
 
 }

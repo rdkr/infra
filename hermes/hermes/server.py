@@ -27,7 +27,7 @@ class Server:
         self.csgo = False
         self.csgo_info = None
         self.timeout_cur = 0
-        self.timeout_max = 600
+        self.timeout_max = 300
 
     async def update_csgo(self):
         try:
@@ -43,35 +43,42 @@ class Server:
     async def update_state(self):
 
         if self.current == State.UNKNOWN:
-            if self.droplet and self.csgo:
+            if self.csgo:
                 await self.update(current=State.ON)
             else:
                 await self.update(current=State.OFF)
 
-        if self.current in [State.STARTING] and self.csgo:
-            await self.update(current=State.ON)
+        elif self.current == State.STARTING:
+            if self.csgo:
+                await self.update(current=State.ON)
 
-        elif self.current in [State.ON, State.STOPPING] and not self.droplet:
-            await self.update(current=State.OFF)
+        elif self.current == State.STOPPING:
+            if not self.droplet:
+                await self.update(current=State.OFF)
 
-        elif self.current in [State.ON] and self.csgo:
-            if self.csgo_info.player_count > 0:
-                self.timeout_cur = 0
-            elif self.timeout_cur > self.timeout_max:
-                self.timeout_cur = 0
-                await self.update(desired=State.OFF)
-            else:
-                self.timeout_cur = self.timeout_cur + 1
-
-        elif self.current in [State.ON] and not self.csgo:
-            await self.update(current=State.STARTING)
-
-        if self.desired == State.ON:
-            if self.current in [State.OFF]:
+        elif self.current == State.OFF:
+            if self.desired == State.ON:
+                await self.update(current=State.STARTING)
                 await self.create()
+            elif self.csgo:
+                await self.update(current=State.ON)
 
-        if self.desired == State.OFF:
-            await self.destroy()
+        elif self.current == State.ON:
+            if not self.droplet:
+                await self.update(current=State.OFF)
+
+            elif self.desired == State.OFF:
+                await self.update(current=State.STOPPING)
+                await self.destroy()
+
+            else:
+                if self.csgo_info.player_count > 0:
+                    self.timeout_cur = 0
+                elif self.timeout_cur == self.timeout_max:
+                    self.timeout_cur = 0
+                    await self.update(desired=State.OFF)
+                else:
+                    self.timeout_cur = self.timeout_cur + 1
 
     async def create(self):
 
@@ -92,15 +99,11 @@ class Server:
             user_data=user_data,
         ).create()
 
-        await self.update(current=State.STARTING)
-
     async def destroy(self):
-        if self.droplet:
-            try:
-                self.droplet.destroy()
-            except digitalocean.baseapi.NotFoundError:
-                pass
-            await self.update(current=State.STOPPING)
+        try:
+            self.droplet.destroy()
+        except digitalocean.baseapi.NotFoundError:
+            pass
 
     async def update(self, **kwargs):
         for key, new in kwargs.items():
