@@ -27,7 +27,7 @@ class Server:
         self.csgo = False
         self.csgo_info = None
         self.timeout_cur = 0
-        self.timeout_max = 300
+        self.timeout_max = 180
 
     async def update_csgo(self):
         try:
