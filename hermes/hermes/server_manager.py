@@ -29,6 +29,8 @@ class ServerManager:
     def __init__(self):
         self.q = asyncio.Queue()
         self.errors = 0
+
+        self.do_manager = digitalocean.Manager(token=os.environ["DO_TOKEN"])
         self.servers = {"pug": Server("pug", self.q), "dm": Server("dm", self.q)}
 
     async def start(self, app):
@@ -40,10 +42,7 @@ class ServerManager:
     @loop(10)
     async def manager_droplet_loop(self):
 
-        droplets_list = digitalocean.Manager(
-            token=os.environ["DO_TOKEN"]
-        ).get_all_droplets()
-
+        droplets_list = self.do_manager.get_all_droplets()
         csgo_list = [d for d in droplets_list if d.name.startswith("csgo")]
 
         if len(csgo_list) > 2:

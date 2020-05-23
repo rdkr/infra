@@ -82,6 +82,8 @@ class Server:
 
     async def create(self):
 
+        logging.info(f"creating {self.name}")
+
         with open(f"cloud-config/{self.name}.yaml") as f:
             template = jinja2.Template(f.read())
             user_data = template.render(env=os.environ)
@@ -90,7 +92,7 @@ class Server:
             token=os.environ["DO_TOKEN"],
             name=f"csgo-{self.name}",
             region="lon1",
-            image="63267584",
+            image="64076968",
             size_slug="s-1vcpu-2gb",
             ssh_keys=[
                 "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGs5SOHcst8xy0Te3LR3/0fGIIYaTc3yLnts1ZZQLuvn neel@Neels-MBP"
@@ -100,6 +102,8 @@ class Server:
         ).create()
 
     async def destroy(self):
+        logging.info(f"destroying {self.name}")
+
         try:
             self.droplet.destroy()
         except digitalocean.baseapi.NotFoundError:

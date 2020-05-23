@@ -22,8 +22,10 @@ install:
 uninstall:
 	kubectl delete -f k8s.yaml
 
-redeploy:
+undeploy:
 	kubectl delete deployments -n hermes hermes
+
+redeploy: undeploy
 	kubectl apply -f k8s.yaml
 
 flow.png: flow.dot
