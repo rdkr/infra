@@ -23,7 +23,7 @@ uninstall:
 	kubectl delete -f k8s.yaml
 
 undeploy:
-	kubectl delete deployments -n hermes hermes
+	-kubectl delete deployments -n hermes hermes
 
 redeploy: undeploy
 	kubectl apply -f k8s.yaml
