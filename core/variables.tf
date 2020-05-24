@@ -29,3 +29,11 @@ variable "CSGO_SV_PASSWORD" {
 variable "CSGO_DISCORD_TOKEN" {
   type = string
 }
+
+variable "HERMES_AWS_ACCESS_KEY_ID" {
+  type = string
+}
+
+variable "HERMES_AWS_SECRET_ACCESS_KEY" {
+  type = string
+}

@@ -1,3 +1,4 @@
+
 resource "digitalocean_domain" "dm_rdkr_uk" {
   name = "dm.rdkr.uk"
 }
