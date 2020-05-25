@@ -57,6 +57,7 @@ class Server:
                 await self.update(current=State.OFF)
 
         elif self.current == State.OFF:
+            self.timeout_cur = 0
             if self.desired == State.ON:
                 await self.update(current=State.STARTING)
                 await self.create()
