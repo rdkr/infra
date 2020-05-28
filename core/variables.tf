@@ -6,6 +6,14 @@ variable "do_token" {
   type = string
 }
 
+variable "AWS_ACCESS_KEY_ID" {
+  type = string
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  type = string
+}
+
 variable "CSGO_GSLT_TOKEN_DM" {
   type = string
 }
