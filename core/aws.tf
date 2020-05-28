@@ -47,7 +47,7 @@ module "db" {
   # disable backups to create DB faster
   backup_retention_period = 0
 
-  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+//  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 
   # DB subnet group
   subnet_ids = module.vpc.public_subnets
