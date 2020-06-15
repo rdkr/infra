@@ -67,8 +67,6 @@ resource "kubernetes_secret" "hermes" {
     "CSGO_DISCORD_TOKEN"    = var.CSGO_DISCORD_TOKEN
     "AWS_ACCESS_KEY_ID"     = var.HERMES_AWS_ACCESS_KEY_ID
     "AWS_SECRET_ACCESS_KEY" = var.HERMES_AWS_SECRET_ACCESS_KEY
-    "DB_HOST"               = module.db.this_db_instance_address
-    "DB_PW"                 = var.HERMES_DB_PW
   }
 }
 

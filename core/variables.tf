@@ -45,7 +45,3 @@ variable "HERMES_AWS_ACCESS_KEY_ID" {
 variable "HERMES_AWS_SECRET_ACCESS_KEY" {
   type = string
 }
-
-variable "HERMES_DB_PW" {
-  type = string
-}
