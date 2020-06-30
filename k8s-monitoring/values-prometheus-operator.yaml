@@ -21,6 +21,9 @@ alertmanager:
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false # use all servicemonitors
+    resources:
+      requests:
+        cpu: 50m
 kubeApiServer:
   enabled: true
 kubelet:
@@ -39,3 +42,4 @@ kubeProxy:
   enabled: false
 prometheusOperator:
   createCustomResource: false
+  configReloaderCpu: 5m
