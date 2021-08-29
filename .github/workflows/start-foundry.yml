@@ -1,0 +1,22 @@
+name: start-foundry
+on: [workflow_dispatch]
+defaults:
+  run:
+    working-directory: foundry
+env:
+  TF_VAR_terraform_token: ${{ secrets.terraform_token }}
+  TF_VAR_do_token: ${{ secrets.do_token }}
+  TF_VAR_cloudflare_token: ${{ secrets.cloudflare_token }}
+  TF_VAR_foundry_password: ${{ secrets.foundry_password}}
+  TF_VAR_foundry_admin_key: ${{ secrets.foundry_admin_key }}
+  TF_VAR_on: true
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          cli_config_credentials_token: ${{ secrets.terraform_token }}
+      - run: terraform init
+      - run: terraform apply -auto-approve

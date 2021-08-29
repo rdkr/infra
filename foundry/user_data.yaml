@@ -1,0 +1,64 @@
+#cloud-config
+mounts:
+  - ["/dev/disk/by-id/scsi-0DO_Volume_foundry", "/mnt/foundry", "ext4", ""]
+
+# https://gist.github.com/yddlef/df54ee1bbca93095a71d75cd15e216eb
+# https://gist.github.com/mosquito/b23e1c1e5723a7fd9e6568e5cf91180f
+write_files:
+  - path: /etc/docker/compose/foundry/docker-compose.yml
+    permissions: '0755'
+    content: |
+      services:
+        foundry:
+          image: felddy/foundryvtt:0.8.8
+          hostname: vtt.rdkr.uk
+          init: true
+          restart: always
+          volumes:
+            - /mnt/foundry/foundry:/data
+          environment:
+            - CONTAINER_CACHE=/data/container_cache
+            - CONTAINER_PATCH_URLS=https://gist.githubusercontent.com/yddlef/df54ee1bbca93095a71d75cd15e216eb/raw/plutonium-0.8.x.sh
+            - FOUNDRY_USERNAME=rdkr
+            - FOUNDRY_PASSWORD=${foundry_password}
+            - FOUNDRY_ADMIN_KEY=${foundry_admin_key}
+            - FOUNDRY_HOSTNAME=vtt.rdkr.uk
+            - FOUNDRY_PROXY_SSL=true
+            - FOUNDRY_PROXY_PORT=443
+            - FOUNDRY_MINIFY_STATIC_FILES=true
+            - FOUNDRY_WORLD=raid
+        caddy:
+          image: caddy
+          restart: always
+          volumes:
+            - /mnt/foundry/caddy:/data
+          command: caddy reverse-proxy --from vtt.rdkr.uk --to foundry:30000
+          ports:
+            - 80:80
+            - 443:443
+          depends_on:
+            - foundry
+
+  - path: /etc/systemd/system/docker-compose@.service
+    permissions: 0644
+    owner: root
+    content: |
+      [Unit]
+      Description=%i service with docker compose
+      Requires=docker.service
+      After=docker.service
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=true
+      WorkingDirectory=/etc/docker/compose/%i
+      ExecStart=/usr/local/bin/docker-compose up -d --remove-orphans
+      ExecStop=/usr/local/bin/docker-compose down
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+- systemctl daemon-reload
+- systemctl enable docker-compose@foundry
+- systemctl start docker-compose@foundry
