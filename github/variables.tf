@@ -1,3 +1,10 @@
+variable "github_token" {
+  type = string
+}
+variable "terraform_token" {
+  type = string
+}
+
 variable "do_token" {
   type = string
 }
@@ -12,8 +19,4 @@ variable "foundry_password" {
 
 variable "foundry_admin_key" {
   type = string
-}
-
-variable "on" {
-  type = bool
 }

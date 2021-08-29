@@ -1,0 +1,8 @@
+---
+provider: cloudflare
+cloudflare:
+  secretName: cloudflare-api-token
+domainFilters:
+  - rdkr.uk
+rbac:
+  create: true
