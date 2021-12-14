@@ -3,7 +3,7 @@ terraform {
     organization = "rdkr"
 
     workspaces {
-      name = "tf-cloud"
+      name = "infra-github"
     }
   }
 
