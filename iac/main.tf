@@ -3,7 +3,7 @@ terraform {
     organization = "rdkr"
 
     workspaces {
-      name = "tf-cloud"
+      name = "infra-iac"
     }
   }
 
@@ -11,9 +11,14 @@ terraform {
     github = {
       source = "integrations/github"
     }
+    tfe = {
+    }
   }
 }
 
 provider "github" {
   token = var.github_token
+}
+
+provider "tfe" {
 }

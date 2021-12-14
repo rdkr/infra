@@ -1,0 +1,25 @@
+#cloud-config
+
+write_files:
+- path: /etc/systemd/system/minecraft.service
+  permissions: 0644
+  owner: root
+  content: |
+    [Unit]
+    Requires=docker.service
+    After=docker.service
+
+    [Service]
+    ExecStart=/usr/bin/docker run --rm --name minecraft --net host -v /var/minecraft:/data \
+                -e VERSION=1.18.1 \
+                -e TYPE=FABRIC \
+                -e PACKWIZ_URL=https://tbcuk.xyz/tbcuk-survival/modpack/pack.toml \
+                -e EULA=TRUE \
+                -e DIFFICULTY=hard \
+                -e SERVER_NAME=tbcuk-survival \
+                itzg/minecraft-server
+    ExecStop=/usr/bin/docker stop minecraft
+
+runcmd:
+- systemctl daemon-reload
+- systemctl start minecraft.service
