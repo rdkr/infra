@@ -10,15 +10,25 @@ write_files:
     After=docker.service
 
     [Service]
-    ExecStart=/usr/bin/docker run --rm --name minecraft --net host -v /var/minecraft:/data \
+    ExecStartPre=/usr/bin/docker pull google/cloud-sdk:alpine
+    ExecStart=/usr/bin/docker run --rm -v /var/minecraft:/data --name minecraft -p 25565:25565 \
                 -e VERSION=1.18.1 \
                 -e TYPE=FABRIC \
+                -e FABRIC_LOADER_VERSION=0.12.8 \
                 -e PACKWIZ_URL=https://tbcuk.xyz/tbcuk-survival/modpack/pack.toml \
+                -e USE_AIKAR_FLAGS=true \
+                -e MEMORY=3G \
+                -e WHITELIST_FILE=https://raw.githubusercontent.com/rdkr/tbcuk.xyz/main/tbcuk-survival/whitelist.json \
+                -e OPS_FILE=https://raw.githubusercontent.com/rdkr/tbcuk.xyz/main/tbcuk-survival/op.json \
                 -e EULA=TRUE \
                 -e DIFFICULTY=hard \
                 -e SERVER_NAME=tbcuk-survival \
                 itzg/minecraft-server
     ExecStop=/usr/bin/docker stop minecraft
+    ExecStopPost=/usr/bin/docker run --rm -v /var/minecraft:/data \
+                  -entrypoint gsutil \
+                  google/cloud-sdk:alpine \
+                  -m rsync -d -r /data gs://mineecraft-rdkr-uk
 
 runcmd:
 - systemctl daemon-reload
