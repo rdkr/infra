@@ -26,7 +26,7 @@ write_files:
                 itzg/minecraft-server
     ExecStop=/usr/bin/docker stop minecraft
     ExecStopPost=/usr/bin/docker run --rm -v /var/minecraft:/data \
-                  -entrypoint gsutil \
+                  --entrypoint gsutil \
                   google/cloud-sdk:alpine \
                   -m rsync -d -r /data gs://mineecraft-rdkr-uk
 
